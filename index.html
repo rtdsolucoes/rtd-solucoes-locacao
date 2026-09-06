@@ -110,7 +110,7 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <label class="terms"><input type="checkbox" id="terms"> Confirmo os dados informados e estou ciente de que consumíveis não estão incluídos na locação padrão.</label>
 <button class="confirm" id="confirm" disabled>Confirmar reserva</button><div class="success" id="success"></div></div></div>
 
-<div class="modal" id="reservationDoneModal"><div class="modal-card reservation-done-card"><div class="reservation-check">✓</div><h2>Solicitação de reserva concluída</h2><p class="sub">Sua solicitação foi registrada com sucesso e ficará disponível para acompanhamento.</p><div class="statusbox" id="reservationDoneDetails"></div><div class="reservation-done-actions"><button class="confirm" id="closeReservationDone">Concluir</button><a class="smallbtn" id="reservationDoneWhatsApp" target="_blank" rel="noopener">Falar com a RTD no WhatsApp</a></div></div></div><div class="modal" id="customerAlertModal"><div class="modal-card customer-alert-card"><div class="customer-alert-icon">⚠️</div><h2 id="customerAlertTitle">Aviso importante sobre sua reserva</h2><p class="sub" id="customerAlertSub">Há uma atualização operacional que precisa da sua atenção.</p><div class="customer-alert-message" id="customerAlertMessage"></div><div class="customer-alert-actions"><button class="confirm" id="customerAlertRead">Entendi</button><button class="smallbtn" id="customerAlertHistory">Ver minhas reservas</button></div></div></div>
+<div class="modal" id="reservationDoneModal"><div class="modal-card reservation-done-card"><div class="reservation-check">✓</div><h2>Solicitação de reserva concluída</h2><p class="sub">Sua solicitação foi registrada com sucesso e ficará disponível para acompanhamento.</p><div class="statusbox" id="reservationDoneDetails"></div><div class="reservation-done-actions"><button class="confirm" id="closeReservationDone">Concluir</button><a class="smallbtn" id="reservationDoneWhatsApp" target="_blank" rel="noopener">Falar com a RTD no WhatsApp</a></div></div></div><div class="modal" id="customerAlertModal"><div class="modal-card customer-alert-card"><div class="customer-alert-icon">⚠️</div><h2 id="customerAlertTitle">Aviso importante sobre sua reserva</h2><p class="sub" id="customerAlertSub">Há uma atualização operacional que precisa da sua atenção.</p><div class="customer-alert-message" id="customerAlertMessage"></div><div class="customer-alert-actions"><button class="confirm" id="customerAlertSwap" style="display:none">Trocar pelo equipamento sugerido</button><button class="confirm" id="customerAlertRead">Entendi</button><button class="smallbtn" id="customerAlertHistory">Ver minhas reservas</button></div></div></div>
 
 <div class="email-confirm-screen" id="emailConfirmScreen" aria-live="polite">
 <div class="email-confirm-card">
@@ -324,13 +324,41 @@ async function checkCustomerAlerts(){
   try{
     const d=await customerPortal();
     const unread=(d.alertas||[]).filter(a=>a.status==='Não lido');
-    if(!unread.length)return;
+    if(!unread.length){$('#customerAlertSwap').style.display='none';return}
     activeCustomerAlert=unread[0];
     $('#customerAlertTitle').textContent=activeCustomerAlert.titulo||'Aviso importante sobre sua reserva';
     $('#customerAlertMessage').textContent=activeCustomerAlert.mensagem||'Sua reserva recebeu uma atualização operacional.';
     $('#customerAlertSub').innerHTML=unread.length>1?`Você possui <span class="customer-alert-count">${unread.length}</span> avisos não lidos.`:'Leia esta atualização antes de seguir.';
+    const canSwap=activeCustomerAlert.acao_disponivel==='ACEITAR_TROCA'&&!!activeCustomerAlert.equipamento_sugerido_codigo;
+    $('#customerAlertSwap').style.display=canSwap?'inline-block':'none';
+    $('#customerAlertSwap').disabled=false;
+    $('#customerAlertSwap').textContent='Trocar pelo equipamento sugerido';
     $('#customerAlertModal').classList.add('open');
   }catch(e){console.warn('Não foi possível carregar avisos do cliente.',e)}
+}
+async function acceptActiveCustomerReplacement(){
+  if(!activeCustomerAlert||activeCustomerAlert.acao_disponivel!=='ACEITAR_TROCA')return;
+  const btn=$('#customerAlertSwap');
+  btn.disabled=true;
+  btn.textContent='Confirmando troca...';
+  try{
+    const d=await customerPortal({action:'accept_replacement',id:activeCustomerAlert.id});
+    activeCustomerAlert=null;
+    $('#customerAlertModal').classList.remove('open');
+    $('#customerAlertSwap').style.display='none';
+    await loadCustomerStatus();
+    setTimeout(checkCustomerAlerts,100);
+  }catch(e){
+    btn.disabled=false;
+    btn.textContent='Trocar pelo equipamento sugerido';
+    const msg=e.code==='SUGESTAO_INDISPONIVEL'
+      ?'O equipamento sugerido deixou de estar disponível para este período. A RTD irá ajudá-lo com uma nova alternativa.'
+      :e.code==='RESERVA_NAO_SUBSTITUIVEL'
+      ?'Esta reserva não pode mais ser substituída automaticamente.'
+      :'Não foi possível concluir a troca agora. Tente novamente ou fale com a RTD Soluções.';
+    $('#customerAlertMessage').textContent=msg;
+    btn.style.display=e.code==='SUGESTAO_INDISPONIVEL'?'none':'inline-block';
+  }
 }
 async function markActiveCustomerAlertRead(){
   if(!activeCustomerAlert)return;
@@ -341,6 +369,7 @@ async function markActiveCustomerAlertRead(){
 }
 async function openCustomerModal(){await loadCustomerStatus();$('#customerModal').classList.add('open');if(!sessionGet())showAuthPane();else if(!customer||!customer.nome_completo||!customer.whatsapp)await showProfilePane();else showStatusPane();if(sessionGet())setTimeout(checkCustomerAlerts,120)}
 async function requestReservation(code,h){pendingReservation={code,h};await loadCustomerStatus();if(customer?.status==='Aprovado'){openModal(code,h);return}await openCustomerModal()}
+$('#customerAlertSwap').onclick=acceptActiveCustomerReplacement;
 $('#customerAlertRead').onclick=markActiveCustomerAlertRead;
 $('#customerAlertHistory').onclick=async()=>{await markActiveCustomerAlertRead();$('#customerModal').classList.add('open');await showHistoryPane()};
 $('#emailConfirmReturn').onclick=leaveEmailConfirmationScreen;
