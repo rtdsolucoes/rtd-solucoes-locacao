@@ -351,12 +351,86 @@ $('#customerAlertHistory').onclick=async()=>{await markActiveCustomerAlertRead()
 $('#emailVerifyReturn').onclick=closeEmailVerificationLanding;
 $('#openCustomer').onclick=openCustomerModal;$('#closeCustomer').onclick=()=>$('#customerModal').classList.remove('open');
 $('#editCustomerProfile').onclick=showProfilePane;$('#openMyHistory').onclick=showHistoryPane;$('#backToStatus').onclick=showStatusPane;$('#customerLogoutHistory').onclick=()=>{$('#customerLogout').click()};$('#customerLogoutProfile').onclick=()=>{$('#customerLogout').click()};
+
+function validCPFClient(value){
+  const cpf=String(value||'').replace(/\D/g,'');
+  if(!/^\d{11}$/.test(cpf)||/^(\d)\1{10}$/.test(cpf))return false;
+  let sum=0;
+  for(let i=0;i<9;i++)sum+=Number(cpf[i])*(10-i);
+  let digit=11-(sum%11); if(digit>=10)digit=0;
+  if(digit!==Number(cpf[9]))return false;
+  sum=0;
+  for(let i=0;i<10;i++)sum+=Number(cpf[i])*(11-i);
+  digit=11-(sum%11); if(digit>=10)digit=0;
+  return digit===Number(cpf[10]);
+}
+function adultClient(value){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(value||'')))return false;
+  const [y,m,d]=String(value).split('-').map(Number);
+  const birth=new Date(y,m-1,d);
+  if(birth.getFullYear()!==y||birth.getMonth()!==m-1||birth.getDate()!==d)return false;
+  const now=new Date();
+  let age=now.getFullYear()-y;
+  if((now.getMonth()+1)<m||((now.getMonth()+1)===m&&now.getDate()<d))age--;
+  return age>=18;
+}
 $('#customerLogin').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;$('#authMessage').className='authmsg';$('#authMessage').textContent='Entrando...';try{const d=await authFetch('/token?grant_type=password',{email,password});sessionSet(d);const prof=await customerProfileApi().catch(()=>({cliente:null}));if(prof?.cliente?.must_change_password){customer=prof.cliente;updateCustomerButton();await showPasswordPane();return}await loadCustomerStatus();$('#authMessage').className='authmsg ok';if(!customer||!customer.nome_completo||!customer.whatsapp)await showProfilePane();else showStatusPane();setTimeout(checkCustomerAlerts,120)}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.error_description||e?.data?.msg||e?.message||'').toLowerCase();if(msg.includes('invalid login')||msg.includes('invalid credentials'))$('#authMessage').textContent='E-mail ou senha incorretos.';else if(msg.includes('email not confirmed'))$('#authMessage').textContent='Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível entrar agora. Tente novamente em instantes.'}};
-$('#customerSignup').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;const hasSpecial=/[^A-Za-z0-9]/.test(password);if(password.length<8||!hasSpecial){$('#authMessage').className='authmsg bad';$('#authMessage').textContent='A senha deve ter no mínimo 8 caracteres e pelo menos 1 caractere especial, como ! @ # $ % & * ?.';return}$('#authMessage').className='authmsg';$('#authMessage').textContent='Criando acesso...';try{const d=await authFetch('/signup?redirect_to='+encodeURIComponent(emailConfirmRedirectUrl()),{email,password});if(d.access_token){sessionSet(d);customer=null;await showProfilePane()}else{$('#authMessage').className='authmsg ok';$('#authMessage').textContent='Acesso criado. Confira seu e-mail para confirmar a conta e depois entre novamente.'}}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.msg||e?.data?.error_description||e?.message||'').toLowerCase();if(msg.includes('already')||msg.includes('registered')||msg.includes('exists'))$('#authMessage').textContent='Este e-mail já possui um acesso. Use o botão Entrar.';else if(msg.includes('password'))$('#authMessage').textContent='A senha foi recusada. Use pelo menos 8 caracteres e um caractere especial.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível criar o acesso agora. Tente novamente em instantes.'}};
+$('#customerSignup').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;const hasSpecial=/[^A-Za-z0-9]/.test(password);if(password.length<8||!hasSpecial){$('#authMessage').className='authmsg bad';$('#authMessage').textContent='A senha deve ter no mínimo 8 caracteres e pelo menos 1 caractere especial, como ! @ # $ % & * ?.';return}$('#authMessage').className='authmsg';$('#authMessage').textContent='Criando acesso...';try{await authFetch('/signup?redirect_to='+encodeURIComponent(emailConfirmRedirectUrl()),{email,password});sessionSet(null);customer=null;$('#authMessage').className='authmsg ok';$('#authMessage').textContent='Acesso criado. Para continuar, confirme seu e-mail pelo link enviado e depois faça login.'}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.msg||e?.data?.error_description||e?.message||'').toLowerCase();if(msg.includes('already')||msg.includes('registered')||msg.includes('exists'))$('#authMessage').textContent='Este e-mail já possui um acesso. Use o botão Entrar.';else if(msg.includes('password'))$('#authMessage').textContent='A senha foi recusada. Use pelo menos 8 caracteres e um caractere especial.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível criar o acesso agora. Tente novamente em instantes.'}};
 $('#saveFirstPassword').onclick=async()=>{const p1=$('#firstNewPassword').value,p2=$('#firstNewPassword2').value;const hasSpecial=/[^A-Za-z0-9]/.test(p1);if(p1.length<8||!hasSpecial){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='A nova senha deve ter no mínimo 8 caracteres e pelo menos 1 caractere especial.';return}if(p1!==p2){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='As duas senhas não coincidem.';return}const sess=await refreshSession();if(!sess?.access_token){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='Sua sessão expirou. Entre novamente.';return}$('#firstPasswordMessage').className='authmsg';$('#firstPasswordMessage').textContent='Salvando nova senha...';try{const r=await fetch(AUTH_URL+'/user',{method:'PUT',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+sess.access_token},body:JSON.stringify({password:p1})});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.msg||d.error_description||'ERRO'),{status:r.status,data:d});await customerProfileApi({action:'password_changed'});customer=null;await loadCustomerStatus();$('#firstPasswordMessage').className='authmsg ok';$('#firstPasswordMessage').textContent='Senha alterada com sucesso.';if(!customer||!customer.cpf||!customer.whatsapp)await showProfilePane();else showStatusPane()}catch(e){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='Não foi possível alterar a senha. Escolha uma senha diferente da temporária e tente novamente.'}};
 const firstPassLogout=()=>{sessionSet(null);customer=null;pendingReservation=null;$('#authEmail').value='';$('#authPassword').value='';updateCustomerButton();showAuthPane()};
 $('#logoutFirstPassword').onclick=firstPassLogout;
-$('#submitProfile').onclick=async()=>{if(!$('#regConsent').checked){$('#profileMessage').className='authmsg bad';$('#profileMessage').textContent='É necessário confirmar as declarações antes de enviar.';return}const previousStatus=customer?.status||'Pendente';const payload={action:'customer_register',nome_completo:$('#regName').value,cpf:$('#regCpf').value,data_nascimento:$('#regBirth').value,whatsapp:$('#regPhone').value,cep:$('#regCep').value,endereco:$('#regAddress').value,numero:$('#regNumber').value,complemento:$('#regComplement').value,bairro:$('#regDistrict').value,cidade:$('#regCity').value,uf:$('#regUf').value};$('#profileMessage').textContent='Enviando para análise...';try{const d=await api(payload,true);customer=d.cliente;if(previousStatus==='Pendência'){try{await api({action:'customer_request_review'},true);customer.revisao_solicitada=true}catch{}}updateCustomerButton();showStatusPane()}catch(e){$('#profileMessage').className='authmsg bad';$('#profileMessage').textContent=e.code==='CPF_JA_CADASTRADO'?'Este CPF já possui cadastro na RTD.':'Confira os dados. É necessário informar CPF válido, ser maior de 18 anos e preencher o endereço completo.'}};
+$('#submitProfile').onclick=async()=>{
+  if(!$('#regConsent').checked){
+    $('#profileMessage').className='authmsg bad';
+    $('#profileMessage').textContent='É necessário confirmar as declarações antes de enviar.';
+    return;
+  }
+  const cpf=$('#regCpf').value;
+  const birth=$('#regBirth').value;
+  if(!validCPFClient(cpf)){
+    $('#profileMessage').className='authmsg bad';
+    $('#profileMessage').textContent='CPF inválido. Confira os 11 dígitos informados.';
+    $('#regCpf').focus();
+    return;
+  }
+  if(!adultClient(birth)){
+    $('#profileMessage').className='authmsg bad';
+    $('#profileMessage').textContent='A locação está disponível apenas para maiores de 18 anos. Confira a data de nascimento.';
+    $('#regBirth').focus();
+    return;
+  }
+  const previousStatus=customer?.status||'Pendente';
+  const payload={action:'customer_register',nome_completo:$('#regName').value,cpf,data_nascimento:birth,whatsapp:$('#regPhone').value,cep:$('#regCep').value,endereco:$('#regAddress').value,numero:$('#regNumber').value,complemento:$('#regComplement').value,bairro:$('#regDistrict').value,cidade:$('#regCity').value,uf:$('#regUf').value};
+  $('#profileMessage').className='authmsg';
+  $('#profileMessage').textContent='Enviando para análise...';
+  try{
+    const d=await api(payload,true);
+    customer=d.cliente;
+    if(previousStatus==='Pendência'){
+      try{await api({action:'customer_request_review'},true);customer.revisao_solicitada=true}catch{}
+    }
+    updateCustomerButton();
+    showStatusPane();
+  }catch(e){
+    $('#profileMessage').className='authmsg bad';
+    const messages={
+      EMAIL_NAO_CONFIRMADO:'Seu e-mail ainda não foi confirmado. Confirme pelo link recebido antes de concluir o cadastro.',
+      CPF_INVALIDO:'CPF inválido. Confira os 11 dígitos informados.',
+      CPF_JA_CADASTRADO:'Este CPF já possui cadastro na RTD.',
+      IDADE_INVALIDA:'A locação está disponível apenas para maiores de 18 anos. Confira a data de nascimento.',
+      NOME_INVALIDO:'Informe o nome completo.',
+      WHATSAPP_INVALIDO:'Informe um número de WhatsApp válido com DDD.',
+      CEP_INVALIDO:'Informe um CEP válido com 8 dígitos.',
+      ENDERECO_INVALIDO:'Confira o endereço informado.',
+      NUMERO_INVALIDO:'Informe o número do endereço.',
+      BAIRRO_INVALIDO:'Informe o bairro.',
+      CIDADE_INVALIDA:'Informe a cidade.',
+      UF_INVALIDA:'Informe a UF com 2 letras.',
+      CADASTRO_NAO_EDITAVEL:'Este cadastro não pode ser alterado nesta etapa.'
+    };
+    $('#profileMessage').textContent=messages[e.code]||'Não foi possível concluir o cadastro. Confira os campos informados e tente novamente.';
+  }
+};
 $('#requestReview').onclick=async()=>{try{await api({action:'customer_request_review'},true);$('#statusMessage').className='authmsg ok';$('#statusMessage').textContent='Solicitação de revisão registrada. A RTD fará uma nova análise.';customer.revisao_solicitada=true}catch{$('#statusMessage').className='authmsg bad';$('#statusMessage').textContent='Não foi possível solicitar a revisão agora.'}};
 $('#customerLogout').onclick=()=>{sessionSet(null);customer=null;pendingReservation=null;$('#authEmail').value='';$('#authPassword').value='';$('#authMessage').className='authmsg';$('#authMessage').textContent='Use seu e-mail para entrar ou criar seu acesso.';updateCustomerButton();showAuthPane();$('#customerModal').classList.remove('open')};
 $('#newAdminCustomer').onclick=()=>{$('#adminNewCustomerName').value='';$('#adminNewCustomerEmail').value='';$('#adminNewCustomerPhone').value='';$('#adminCustomerCreateMsg').className='authmsg';$('#adminCustomerCreateMsg').textContent='';$('#tempPasswordBox').style.display='none';$('#adminCustomerCreateModal').classList.add('open')};
