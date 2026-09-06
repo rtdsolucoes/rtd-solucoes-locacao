@@ -132,7 +132,7 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div class="modal" id="customerModal"><div class="modal-card"><div class="mhead"><div><div class="eyebrow">RTD CLIENTE VERIFICADO</div><h2>Cadastro e acesso</h2><p class="sub">Somente clientes aprovados podem concluir reservas.</p></div><button class="close" id="closeCustomer">×</button></div>
 <div id="authPane">
 <div class="formgrid"><div class="field full"><label>E-mail</label><input id="authEmail" type="email" autocomplete="email"></div><div class="field full"><label>Senha</label><input id="authPassword" type="password" minlength="8" autocomplete="current-password" aria-describedby="passwordRule"><small id="passwordRule" class="sub" style="display:block;margin-top:6px">Para criar um acesso, use no mínimo 8 caracteres e pelo menos 1 caractere especial, como ! @ # $ % &amp; * ?.</small></div></div>
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="confirm" id="customerLogin" style="flex:1">Entrar</button><button class="smallbtn" id="customerSignup" style="flex:1">Criar acesso</button></div><div class="authmsg" id="authMessage">Use seu e-mail para entrar ou criar seu acesso.</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="confirm" id="customerLogin" style="flex:1">Entrar</button><button class="smallbtn" id="customerSignup" style="flex:1">Criar acesso</button></div><div class="authmsg" id="authMessage">Use seu e-mail para entrar ou criar seu acesso.</div><div class="sub" style="margin-top:8px;font-size:11px">Após clicar em <b>Criar acesso</b>, aguarde o retorno do sistema. Repetir o cadastro não acelera o envio do e-mail e pode acionar limites de segurança do provedor.</div>
 </div>
 <div id="passwordPane" style="display:none"><div class="statusbox"><div class="eyebrow">PRIMEIRO ACESSO</div><h3>Crie sua senha definitiva</h3><p class="sub">Esta conta foi criada pela RTD com uma senha temporária. Antes de continuar, defina uma nova senha pessoal.</p></div>
 <div class="formgrid"><div class="field full"><label>Nova senha</label><input id="firstNewPassword" type="password" minlength="8" autocomplete="new-password"><small class="sub" style="display:block;margin-top:6px">Mínimo de 8 caracteres e pelo menos 1 caractere especial.</small></div><div class="field full"><label>Confirmar nova senha</label><input id="firstNewPassword2" type="password" minlength="8" autocomplete="new-password"></div></div>
@@ -294,7 +294,7 @@ function leaveEmailConfirmationScreen(){
 
 const sessionGet=()=>{try{return JSON.parse(localStorage.getItem('rtd_customer_session')||'null')}catch{return null}};
 const sessionSet=s=>s?localStorage.setItem('rtd_customer_session',JSON.stringify(s)):localStorage.removeItem('rtd_customer_session');
-async function authFetch(path,body){const r=await fetch(AUTH_URL+path,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.msg||d.error_description||d.error||'ERRO_AUTH'),{code:d.error||'ERRO_AUTH',status:r.status});return d}
+async function authFetch(path,body){const r=await fetch(AUTH_URL+path,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.msg||d.error_description||d.error||'ERRO_AUTH'),{code:d.error||d.error_code||'ERRO_AUTH',status:r.status,data:d});return d}
 async function refreshSession(){const s=sessionGet();if(!s?.refresh_token)return null;if(s.expires_at&&Date.now()/1000<s.expires_at-60)return s;try{const d=await authFetch('/token?grant_type=refresh_token',{refresh_token:s.refresh_token});sessionSet(d);return d}catch{sessionSet(null);customer=null;return null}}
 const api=async(payload,useCustomer=false)=>{const s=useCustomer?await refreshSession():null;const token=s?.access_token||ANON;const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok) throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
 const financeApi=async(payload)=>{const token=ANON;const r=await fetch(FINANCE_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
@@ -308,6 +308,7 @@ function toISO(date,time){return new Date(`${date}T${time}:00-03:00`).toISOStrin
 function addHours(iso,h){return new Date(new Date(iso).getTime()+Number(h)*3600000)}
 function fmtDT(v){return new Date(v).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
 let bookingOptionsCache=null;
+let signupCooldownUntil=0,signupCooldownTimer=null;
 async function syncBookingOptions(){
   const hours=Number($('#period').value||1);
   const requested=$('#date').value||'';
@@ -568,7 +569,23 @@ $('#emailConfirmReturn').onclick=leaveEmailConfirmationScreen;
 $('#openCustomer').onclick=openCustomerModal;$('#closeCustomer').onclick=()=>$('#customerModal').classList.remove('open');
 $('#editCustomerProfile').onclick=showProfilePane;$('#openMyHistory').onclick=showHistoryPane;$('#backToStatus').onclick=showStatusPane;$('#customerLogoutHistory').onclick=()=>{$('#customerLogout').click()};$('#customerLogoutProfile').onclick=()=>{$('#customerLogout').click()};
 $('#customerLogin').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;$('#authMessage').className='authmsg';$('#authMessage').textContent='Entrando...';try{const d=await authFetch('/token?grant_type=password',{email,password});sessionSet(d);const prof=await customerProfileApi().catch(()=>({cliente:null}));if(prof?.cliente?.must_change_password){customer=prof.cliente;updateCustomerButton();await showPasswordPane();return}await loadCustomerStatus();$('#authMessage').className='authmsg ok';if(!customer||!customer.nome_completo||!customer.whatsapp)await showProfilePane();else showStatusPane();setTimeout(checkCustomerAlerts,120)}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.error_description||e?.data?.msg||e?.message||'').toLowerCase();if(msg.includes('invalid login')||msg.includes('invalid credentials'))$('#authMessage').textContent='E-mail ou senha incorretos.';else if(msg.includes('email not confirmed'))$('#authMessage').textContent='Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível entrar agora. Tente novamente em instantes.'}};
+
+function startSignupCooldown(seconds=60){
+  signupCooldownUntil=Date.now()+seconds*1000;
+  const btn=$('#customerSignup');
+  if(signupCooldownTimer)clearInterval(signupCooldownTimer);
+  const tick=()=>{
+    const left=Math.max(0,Math.ceil((signupCooldownUntil-Date.now())/1000));
+    if(left<=0){
+      clearInterval(signupCooldownTimer);signupCooldownTimer=null;
+      btn.disabled=false;btn.textContent='Criar acesso';return;
+    }
+    btn.disabled=true;btn.textContent=`Aguarde ${left}s`;
+  };
+  tick();signupCooldownTimer=setInterval(tick,1000);
+}
 $('#customerSignup').onclick=async()=>{
+  if(Date.now()<signupCooldownUntil)return;
   const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;
   const hasSpecial=/[^A-Za-z0-9]/.test(password);
   if(password.length<8||!hasSpecial){
@@ -583,6 +600,7 @@ $('#customerSignup').onclick=async()=>{
   $('#authMessage').textContent='Criando acesso...';
 
   try{
+    startSignupCooldown(60);
     const d=await authFetch('/signup?redirect_to='+encodeURIComponent(emailConfirmationRedirect()),{email,password});
 
     // Mesmo que o serviço devolva uma sessão, não avançamos para o cadastro.
@@ -604,8 +622,8 @@ $('#customerSignup').onclick=async()=>{
       $('#authMessage').textContent='Este e-mail já possui um acesso. Se já confirmou o e-mail, use Entrar.';
     else if(msg.includes('password'))
       $('#authMessage').textContent='A senha foi recusada. Use pelo menos 8 caracteres e um caractere especial.';
-    else if(e?.status===429||msg.includes('rate'))
-      $('#authMessage').textContent='Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';
+    else if(e?.status===429||msg.includes('rate')||msg.includes('email rate limit'))
+      $('#authMessage').textContent='O limite temporário de envio de e-mails de confirmação foi atingido. O cadastro não deve ser repetido agora. Aguarde a liberação do serviço de e-mail antes de tentar novamente.';
     else
       $('#authMessage').textContent='Não foi possível criar o acesso agora. Tente novamente em instantes.';
   }
