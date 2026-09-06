@@ -138,6 +138,30 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 @media(max-width:980px){.need-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.need-grid{grid-template-columns:1fr}.store-actions,.checkout-actions{grid-template-columns:1fr}.cart-line{grid-template-columns:1fr auto}.cart-line>strong{grid-column:1/-1}.cart-btn{padding:9px}}
 
+
+/* RC6 — checkout intuitivo, entrega e frete */
+.checkout-profile-note{display:none;border-radius:11px;padding:10px 12px;background:#eef8f3;color:#17653d;font-size:12px;margin:10px 0}
+.checkout-profile-note.show{display:block}
+.delivery-box{margin-top:15px;border-top:1px solid #e4e9eb;padding-top:15px}
+.delivery-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.delivery-option{border:1px solid #dce3e6;border-radius:13px;padding:12px;background:#fff;cursor:pointer;display:flex;gap:9px;align-items:flex-start}
+.delivery-option.active{border-color:#ff6b00;box-shadow:0 0 0 2px rgba(255,107,0,.09)}
+.delivery-option.disabled{opacity:.58;cursor:not-allowed;background:#f5f6f7}
+.delivery-option input{margin-top:3px}.delivery-option b{display:block;font-size:13px}.delivery-option small{display:block;color:#68767d;margin-top:3px;line-height:1.35}
+.shipping-status{font-size:12px;color:#66747b;margin-top:9px}
+.checkout-summary{margin-top:14px;border-radius:13px;background:#f7f9fa;padding:12px}
+.checkout-summary .sumrow{display:flex;justify-content:space-between;gap:15px;padding:4px 0;font-size:13px}
+.checkout-summary .sumrow.total{font-size:18px;font-weight:950;border-top:1px solid #dce3e6;margin-top:7px;padding-top:10px}
+.shipping-admin{margin-top:20px;border-top:1px solid #dfe5e7;padding-top:18px}
+.shipping-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.shipping-card{border:1px solid #dce3e6;border-radius:15px;background:#fff;padding:15px}
+.shipping-rules{display:grid;gap:8px;margin-top:10px}
+.shipping-rule{border:1px solid #e2e7e9;border-radius:11px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shipping-rule small{display:block;color:#68767d;margin-top:3px}
+.shipping-rule-actions{display:flex;gap:6px}
+.shipping-rule-actions button{border:1px solid #d9e0e3;background:#fff;border-radius:8px;padding:7px 9px;cursor:pointer}
+@media(max-width:760px){.delivery-options{grid-template-columns:1fr}.shipping-admin-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -218,14 +242,31 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div class="email-confirm-actions"><button class="confirm" id="emailConfirmReturn" style="max-width:280px">Voltar para RTD Soluções</button></div>
 </div></div>
 
-<div class="modal" id="cartModal"><div class="modal-card" style="width:min(680px,100%)">
-  <div class="mhead"><div><div class="eyebrow">COMPRA DE CONSUMÍVEIS</div><h2>Seu carrinho</h2><p class="sub">Confira os itens e escolha como deseja finalizar.</p></div><button class="close" id="closeCart">×</button></div>
+<div class="modal" id="cartModal"><div class="modal-card" style="width:min(760px,100%)">
+  <div class="mhead"><div><div class="eyebrow">COMPRA DE CONSUMÍVEIS</div><h2>Seu carrinho</h2><p class="sub">Se você estiver logado, seus dados cadastrais serão preenchidos automaticamente.</p></div><button class="close" id="closeCart">×</button></div>
   <div id="cartItems"><div class="loading">Seu carrinho está vazio.</div></div>
-  <div class="cart-total"><span>Total</span><strong id="cartTotal">R$ 0,00</strong></div>
+  <div class="checkout-profile-note" id="checkoutProfileNote">✓ Dados preenchidos automaticamente a partir do seu cadastro RTD. Você pode corrigir o endereço abaixo antes de calcular o frete.</div>
   <div class="formgrid">
     <div class="field full"><label>Nome</label><input id="checkoutName" placeholder="Nome completo"></div>
     <div class="field"><label>E-mail</label><input id="checkoutEmail" type="email" placeholder="voce@email.com"></div>
     <div class="field"><label>WhatsApp</label><input id="checkoutPhone" placeholder="(16) 99999-9999"></div>
+    <div class="field"><label>CEP</label><input id="checkoutCep" inputmode="numeric" maxlength="9" placeholder="00000-000"></div>
+    <div class="field"><label>UF</label><input id="checkoutUf" maxlength="2"></div>
+    <div class="field full"><label>Endereço</label><input id="checkoutAddress"></div>
+    <div class="field"><label>Número</label><input id="checkoutNumber"></div>
+    <div class="field"><label>Complemento</label><input id="checkoutComplement"></div>
+    <div class="field"><label>Bairro</label><input id="checkoutDistrict"></div>
+    <div class="field"><label>Cidade</label><input id="checkoutCity"></div>
+  </div>
+  <div class="delivery-box">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><b>Forma de recebimento</b><div class="sub">Retirada, entrega própria RTD ou envio pelos Correios.</div></div><button class="smallbtn" id="calcShippingBtn" type="button">Calcular frete</button></div>
+    <div class="delivery-options" id="deliveryOptions"><div class="loading">Informe o CEP para calcular as opções.</div></div>
+    <div class="shipping-status" id="shippingStatus"></div>
+  </div>
+  <div class="checkout-summary">
+    <div class="sumrow"><span>Produtos</span><strong id="cartSubtotal">R$ 0,00</strong></div>
+    <div class="sumrow"><span>Frete</span><strong id="cartFreight">R$ 0,00</strong></div>
+    <div class="sumrow total"><span>Total</span><strong id="cartTotal">R$ 0,00</strong></div>
   </div>
   <div class="mp-status pending" id="mpStatus">Verificando disponibilidade do Mercado Pago...</div>
   <div class="checkout-actions">
@@ -315,6 +356,10 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div class="field"><label>Estoque atual</label><input id="conStock" type="number" min="0" step="1"></div>
 <div class="field"><label>Estoque mínimo</label><input id="conMinStock" type="number" min="0" step="1"></div>
 <div class="field wide"><label>URL HTTPS da imagem</label><input id="conImage" placeholder="https://..."></div>
+<div class="field"><label>Peso unitário (kg)</label><input id="conWeight" type="number" min="0" step="0.001" placeholder="Ex.: 0.10"></div>
+<div class="field"><label>Altura embalada (cm)</label><input id="conHeight" type="number" min="0" step="0.1"></div>
+<div class="field"><label>Largura embalada (cm)</label><input id="conWidth" type="number" min="0" step="0.1"></div>
+<div class="field"><label>Comprimento embalado (cm)</label><input id="conLength" type="number" min="0" step="0.1"></div>
 <div class="field wide"><label>Necessidades em que este item deve ser sugerido</label>
     <div id="conNeeds" class="need-selector">
       <label><input type="checkbox" value="furar"> Furar uma parede</label>
@@ -330,7 +375,40 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div class="cons-list-card"><div class="cons-preview" id="consPreview"><div class="cons-preview-media"><div class="cons-preview-placeholder">Selecione um consumível ou crie um novo cadastro.</div></div><div class="cons-preview-info"><div class="eyebrow">PRÉ-VISUALIZAÇÃO</div><h3>Novo consumível</h3><p class="sub">A imagem informada será exibida aqui.</p></div></div>
 <div class="head"><div><h3>Consumíveis cadastrados</h3><p class="sub">Itens ativos aparecem para clientes quando compatíveis com o equipamento selecionado.</p></div></div>
 <div id="consumableAdminGrid" class="cons-grid"><div class="loading">Abra esta aba para carregar os consumíveis.</div></div>
-</div></div></div>
+</div></div>
+<div class="shipping-admin">
+  <div class="head"><div><h3>Entrega e frete</h3><p class="sub">Configure retirada, origem dos envios e faixas de CEP atendidas pela entrega própria da RTD. Os Correios exigem credenciais de contrato configuradas no backend.</p></div><button class="smallbtn" id="refreshShippingAdmin">Atualizar frete</button></div>
+  <div class="shipping-admin-grid">
+    <div class="shipping-card">
+      <h3>Configurações gerais</h3>
+      <div class="formgrid">
+        <div class="field"><label>CEP de origem</label><input id="shipOriginCep" maxlength="9" placeholder="00000-000"></div>
+        <div class="field"><label>Serviços Correios</label><input id="shipCorreiosServices" placeholder="03220,03298"></div>
+        <div class="field full"><label>Endereço de retirada</label><input id="shipPickupAddress" placeholder="Informe o endereço que será mostrado ao cliente"></div>
+      </div>
+      <button class="smallbtn" id="saveShippingSettings" style="margin-top:10px">Salvar configurações</button>
+      <div class="authmsg" id="shippingSettingsMsg"></div>
+      <div class="statusbox" style="margin-top:12px"><b>Status Correios</b><p class="sub" id="correiosAdminStatus">Verificando...</p></div>
+    </div>
+    <div class="shipping-card">
+      <h3>Nova faixa de entrega própria</h3>
+      <input type="hidden" id="shipRuleId">
+      <div class="formgrid">
+        <div class="field full"><label>Nome da região</label><input id="shipRuleName" placeholder="Ex.: Ribeirão Preto - região central"></div>
+        <div class="field"><label>CEP inicial</label><input id="shipRuleStart" maxlength="9"></div>
+        <div class="field"><label>CEP final</label><input id="shipRuleEnd" maxlength="9"></div>
+        <div class="field"><label>Valor do frete (R$)</label><input id="shipRuleValue" type="number" min="0" step="0.01"></div>
+        <div class="field"><label>Prazo estimado (dias)</label><input id="shipRuleDays" type="number" min="0" step="1"></div>
+        <div class="field"><label>Prioridade</label><input id="shipRulePriority" type="number" value="100" step="1"></div>
+        <div class="field"><label>Status</label><select id="shipRuleActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="smallbtn" id="saveShippingRule">Salvar faixa</button><button class="smallbtn" id="clearShippingRule">Limpar</button></div>
+      <div class="authmsg" id="shippingRuleMsg"></div>
+    </div>
+  </div>
+  <div class="shipping-card" style="margin-top:12px"><h3>Faixas cadastradas</h3><div class="shipping-rules" id="shippingRulesList"><div class="loading">Carregando...</div></div></div>
+</div>
+</div>
 <div class="adminpane" id="adminPaneFinance">
 <div class="head"><div><h2>Gestão financeira</h2><p class="sub">Indicadores calculados a partir das reservas e dos lançamentos administrativos. Cauções são exibidas separadamente e não compõem receita.</p></div><button class="smallbtn" id="refreshFinance">Atualizar financeiro</button></div>
 <div class="finance-toolbar"><div class="field"><label>De</label><input id="financeFrom" type="date"></div><div class="field"><label>Até</label><input id="financeTo" type="date"></div><button class="smallbtn" id="financeApply">Aplicar período</button><button class="smallbtn" id="financeThisMonth">Mês atual</button><button class="smallbtn" id="financeAll">Todo histórico</button></div>
@@ -350,6 +428,7 @@ const EQUIPMENT_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-e
 const CONSUMABLE_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-consumable-api';
 const STOREFRONT_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-storefront-api';
 const PAYMENT_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-payment-api';
+const SHIPPING_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-shipping-api';
 const ADMIN_CUSTOMER_CREATE_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-admin-customer-create';
 const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYnhwdmZiY21lbW15emhqcGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2Mjk2OTIsImV4cCI6MjEwNDIwNTY5Mn0.mI2_E7s68fUReQHavbTArX6QmdxXaGBtSkzTed3yeKo';
 const COMPANY_WA='5516991146663';
@@ -423,53 +502,64 @@ const financeApi=async(payload)=>{const token=ANON;const r=await fetch(FINANCE_A
 const equipmentApi=async(payload)=>{const r=await fetch(EQUIPMENT_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+ANON},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
 const consumableApi=async(payload)=>{const r=await fetch(CONSUMABLE_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+ANON},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
 const storefrontApi=async(payload={action:'catalog'})=>{const r=await fetch(STOREFRONT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
+
+const shippingApi=async(payload)=>{const r=await fetch(SHIPPING_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
+const shippingAdminApi=async(payload)=>shippingApi(payload);
+
 function consumableImage(c){const v=String(c?.imagem_key||'');return v.startsWith('https://')?v:''}
-let storefrontConsumables=[],cart=[],mpConfigured=false;
+let storefrontConsumables=[],cart=[],mpConfigured=false,selectedShipping={metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,prazo_dias:0,disponivel:true},currentCheckoutProfile=null;
 const NEED_LABELS={furar:'Furar uma parede',montagem:'Montar um móvel',corte:'Cortar madeira',automotivo:'Automotivo',reparos:'Pequenos reparos'};
 function buyConsumableWhatsApp(c){
   const stock=Number(c.estoque_atual||0),price=Number(c.preco_venda||0);
-  const msg=stock>0&&price>0
-    ?`Olá, gostaria de comprar o consumível ${c.codigo} — ${c.nome}, anunciado por ${brl(price)} / ${c.unidade||'un'}. Poderia confirmar a disponibilidade e combinar a retirada?`
-    :`Olá, tenho interesse no consumível ${c.codigo} — ${c.nome}, que aparece sem estoque no site. Gostaria de saber quando estará disponível.`;
+  const msg=stock>0&&price>0?`Olá, gostaria de comprar o consumível ${c.codigo} — ${c.nome}, anunciado por ${brl(price)} / ${c.unidade||'un'}. Poderia confirmar a disponibilidade?`:`Olá, tenho interesse no consumível ${c.codigo} — ${c.nome}, que aparece sem estoque no site. Gostaria de saber quando estará disponível.`;
   window.open('https://wa.me/'+COMPANY_WA+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
 }
-function addCart(c){
-  if(Number(c.estoque_atual||0)<=0||Number(c.preco_venda||0)<=0)return buyConsumableWhatsApp(c);
-  const found=cart.find(x=>x.codigo===c.codigo);
-  if(found){if(found.quantidade<Number(c.estoque_atual||0))found.quantidade++}else cart.push({codigo:c.codigo,nome:c.nome,unidade:c.unidade||'un',preco_venda:Number(c.preco_venda),estoque_atual:Number(c.estoque_atual),quantidade:1});
-  updateCartBadge();
-}
+function addCart(c){if(Number(c.estoque_atual||0)<=0||Number(c.preco_venda||0)<=0)return buyConsumableWhatsApp(c);const found=cart.find(x=>x.codigo===c.codigo);if(found){if(found.quantidade<Number(c.estoque_atual||0))found.quantidade++}else cart.push({codigo:c.codigo,nome:c.nome,unidade:c.unidade||'un',preco_venda:Number(c.preco_venda),estoque_atual:Number(c.estoque_atual),quantidade:1});selectedShipping={metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,prazo_dias:0,disponivel:true};updateCartBadge();renderCart()}
 function updateCartBadge(){const n=cart.reduce((s,x)=>s+x.quantidade,0);if($('#cartCount'))$('#cartCount').textContent=String(n)}
-function cartTotal(){return cart.reduce((s,x)=>s+x.preco_venda*x.quantidade,0)}
-function changeCart(code,delta){const x=cart.find(v=>v.codigo===code);if(!x)return;x.quantidade=Math.max(0,Math.min(x.estoque_atual,x.quantidade+delta));cart=cart.filter(v=>v.quantidade>0);updateCartBadge();renderCart()}
+function cartSubtotal(){return cart.reduce((s,x)=>s+x.preco_venda*x.quantidade,0)}
+function grandTotal(){return cartSubtotal()+Number(selectedShipping?.valor||0)}
+function changeCart(code,delta){const x=cart.find(v=>v.codigo===code);if(!x)return;x.quantidade=Math.max(0,Math.min(x.estoque_atual,x.quantidade+delta));cart=cart.filter(v=>v.quantidade>0);selectedShipping={metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,prazo_dias:0,disponivel:true};updateCartBadge();renderCart()}
 function renderCart(){
   const box=$('#cartItems');if(!box)return;
   box.innerHTML=cart.length?cart.map(x=>`<div class="cart-line"><div><b>${esc(x.nome)}</b><br><small>${esc(x.codigo)} • ${brl(x.preco_venda)} / ${esc(x.unidade)}</small></div><div class="cart-qty"><button onclick="changeCart('${esc(x.codigo)}',-1)">−</button><b>${x.quantidade}</b><button onclick="changeCart('${esc(x.codigo)}',1)">+</button></div><strong>${brl(x.preco_venda*x.quantidade)}</strong></div>`).join(''):'<div class="loading">Seu carrinho está vazio.</div>';
-  $('#cartTotal').textContent=brl(cartTotal());
-  $('#mpCheckoutBtn').disabled=!mpConfigured||!cart.length;
+  if($('#cartSubtotal'))$('#cartSubtotal').textContent=brl(cartSubtotal());
+  if($('#cartFreight'))$('#cartFreight').textContent=brl(selectedShipping?.valor||0);
+  if($('#cartTotal'))$('#cartTotal').textContent=brl(grandTotal());
+  $('#mpCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel;
 }
 function renderStore(items=[]){
-  const box=$('#storeGrid');if(!box)return;
-  storefrontConsumables=items;
+  const box=$('#storeGrid');if(!box)return;storefrontConsumables=items;
   if(!items.length){box.innerHTML='<div class="loading">Nenhum consumível disponível para exibição no momento.</div>';return}
-  box.innerHTML=items.map(c=>{
-    const stock=Number(c.estoque_atual||0),p=Number(c.preco_venda||0),available=stock>0&&p>0,img=consumableImage(c);
-    return `<article class="store-card">
-      <div class="store-photo-wrap">${img?`<img class="store-photo" src="${esc(img)}" alt="${esc(c.nome)}" loading="lazy" onerror="this.style.display='none'">`:'<div style="font-size:52px">🧰</div>'}<span class="store-code">${esc(c.codigo)}</span></div>
-      <div class="store-card-body">
-        <div class="eyebrow">${esc(c.categoria||'Consumível')}</div>
-        <h3>${esc(c.nome)}</h3>
-        <p>${esc(c.descricao||'Consumível para uso em ferramentas e serviços diversos.')}</p>
-        <div class="store-price-row"><div><small>${esc(c.unidade||'un')}</small><div class="store-price">${p>0?brl(p):'Consultar'}</div></div><span class="store-stock ${available?'ok':'no'}">${available?`${stock} em estoque`:'Sem estoque'}</span></div>
-        <div class="store-actions">
-          <button class="store-buy" data-cart-code="${esc(c.codigo)}">${available?'Adicionar ao carrinho':'Consultar'}</button>
-          <button class="store-wa" data-wa-code="${esc(c.codigo)}">WhatsApp</button>
-        </div>
-      </div>
-    </article>`;
-  }).join('');
+  box.innerHTML=items.map(c=>{const stock=Number(c.estoque_atual||0),p=Number(c.preco_venda||0),available=stock>0&&p>0,img=consumableImage(c);return `<article class="store-card"><div class="store-photo-wrap">${img?`<img class="store-photo" src="${esc(img)}" alt="${esc(c.nome)}" loading="lazy" onerror="this.style.display='none'">`:'<div style="font-size:52px">🧰</div>'}<span class="store-code">${esc(c.codigo)}</span></div><div class="store-card-body"><div class="eyebrow">${esc(c.categoria||'Consumível')}</div><h3>${esc(c.nome)}</h3><p>${esc(c.descricao||'Consumível para uso em ferramentas e serviços diversos.')}</p><div class="store-price-row"><div><small>${esc(c.unidade||'un')}</small><div class="store-price">${p>0?brl(p):'Consultar'}</div></div><span class="store-stock ${available?'ok':'no'}">${available?`${stock} em estoque`:'Sem estoque'}</span></div><div class="store-actions"><button class="store-buy" data-cart-code="${esc(c.codigo)}">${available?'Adicionar ao carrinho':'Consultar'}</button><button class="store-wa" data-wa-code="${esc(c.codigo)}">WhatsApp</button></div></div></article>`}).join('');
   box.querySelectorAll('[data-cart-code]').forEach(btn=>btn.addEventListener('click',()=>{const c=items.find(x=>x.codigo===btn.dataset.cartCode);if(c)addCart(c)}));
   box.querySelectorAll('[data-wa-code]').forEach(btn=>btn.addEventListener('click',()=>{const c=items.find(x=>x.codigo===btn.dataset.waCode);if(c)buyConsumableWhatsApp(c)}));
+}
+function fillCheckout(c){
+  if(!c)return;
+  currentCheckoutProfile=c;
+  const vals={checkoutName:c.nome_completo||'',checkoutEmail:c.email||'',checkoutPhone:c.whatsapp||'',checkoutCep:c.cep||'',checkoutAddress:c.endereco||'',checkoutNumber:c.numero||'',checkoutComplement:c.complemento||'',checkoutDistrict:c.bairro||'',checkoutCity:c.cidade||'',checkoutUf:c.uf||''};
+  Object.entries(vals).forEach(([id,v])=>{if($('#'+id))$('#'+id).value=v});
+  $('#checkoutProfileNote')?.classList.add('show');
+}
+async function autofillCheckoutProfile(){
+  $('#checkoutProfileNote')?.classList.remove('show');currentCheckoutProfile=null;
+  if(!sessionGet())return null;
+  try{const d=await customerProfileApi();if(d?.cliente){fillCheckout(d.cliente);return d.cliente}}catch(e){console.warn('Perfil não carregado no carrinho',e)}
+  return null;
+}
+function checkoutAddressPayload(){return {cep:$('#checkoutCep').value,endereco:$('#checkoutAddress').value,numero:$('#checkoutNumber').value,complemento:$('#checkoutComplement').value,bairro:$('#checkoutDistrict').value,cidade:$('#checkoutCity').value,uf:$('#checkoutUf').value}}
+function renderDeliveryOptions(options=[]){
+  const box=$('#deliveryOptions');if(!box)return;
+  if(!options.length){box.innerHTML='<div class="loading">Nenhuma opção de entrega encontrada.</div>';return}
+  box.innerHTML=options.map(o=>{const active=selectedShipping?.metodo===o.metodo&&selectedShipping?.codigo===o.codigo;const val=o.valor==null?'—':brl(o.valor);const prazo=o.prazo_dias==null?'':o.prazo_dias===0?'Disponível para retirada':`${o.prazo_dias} dia(s) estimado(s)`;let why='';if(!o.disponivel){if(o.reason==='CORREIOS_NAO_CONFIGURADO')why='Integração dos Correios aguardando credenciais.';else if(o.reason==='DADOS_EMBALAGEM_INCOMPLETOS')why='Peso e dimensões dos itens precisam ser cadastrados.';else if(o.reason==='FORA_DA_AREA_CONFIGURADA')why='CEP fora das faixas de entrega própria cadastradas.';else why='Indisponível para este pedido.'}return `<label class="delivery-option ${active?'active':''} ${o.disponivel?'':'disabled'}"><input type="radio" name="deliveryOption" value="${esc(o.metodo+'|'+o.codigo)}" ${active?'checked':''} ${o.disponivel?'':'disabled'}><span><b>${esc(o.servico)}</b><small>${o.disponivel?`${val}${prazo?' • '+prazo:''}`:esc(why)}</small>${o.observacao?`<small>${esc(o.observacao)}</small>`:''}</span></label>`}).join('');
+  box.querySelectorAll('input[name="deliveryOption"]').forEach(input=>input.addEventListener('change',()=>{const [metodo,codigo]=input.value.split('|');const found=options.find(x=>x.metodo===metodo&&String(x.codigo)===codigo);if(found){selectedShipping=found;renderDeliveryOptions(options);renderCart()}}));
+}
+async function quoteShipping(){
+  if(!cart.length){$('#shippingStatus').textContent='Adicione itens ao carrinho primeiro.';return}
+  const cep=String($('#checkoutCep').value||'').replace(/\D/g,'');
+  if(cep.length!==8){$('#shippingStatus').textContent='Informe um CEP válido para calcular entrega própria e Correios.';renderDeliveryOptions([{metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,prazo_dias:0,disponivel:true}]);return}
+  $('#shippingStatus').textContent='Calculando opções de entrega...';
+  try{const d=await shippingApi({action:'quote_all',cep,cidade:$('#checkoutCity').value,uf:$('#checkoutUf').value,itens:cart.map(x=>({codigo:x.codigo,quantidade:x.quantidade}))});const opts=d.options||[];const same=opts.find(x=>x.disponivel&&x.metodo===selectedShipping?.metodo&&String(x.codigo)===String(selectedShipping?.codigo));selectedShipping=same||opts.find(x=>x.disponivel&&x.metodo==='retirada')||opts.find(x=>x.disponivel)||{metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,disponivel:true};renderDeliveryOptions(opts);$('#shippingStatus').textContent=d.pacote?.embalagem_completa?'Frete calculado com os dados atuais do carrinho.':'Retirada e entrega própria podem ser usadas. Para Correios, cadastre peso e dimensões dos consumíveis no painel administrativo.';renderCart()}catch(e){console.warn(e);$('#shippingStatus').textContent='Não foi possível calcular o frete agora. A retirada pessoal continua disponível.';selectedShipping={metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,prazo_dias:0,disponivel:true};renderDeliveryOptions([selectedShipping]);renderCart()}
 }
 function renderNeedConsumables(items=[],need=''){
   const wrap=$('#needResults'),box=$('#needConsumablesGrid');if(!wrap||!box)return;
@@ -493,22 +583,27 @@ async function checkMercadoPago(){
 function cartWhatsApp(){
   if(!cart.length)return;
   const lines=cart.map(x=>`${x.quantidade}x ${x.nome} (${x.codigo}) — ${brl(x.preco_venda*x.quantidade)}`).join('\n');
-  const msg=`Olá, gostaria de finalizar este pedido de consumíveis da RTD Soluções:\n\n${lines}\n\nTotal estimado: ${brl(cartTotal())}\n\nPoderia confirmar estoque e retirada?`;
+  const ship=selectedShipping?.servico?`\nEntrega: ${selectedShipping.servico}${Number(selectedShipping.valor||0)>0?' — '+brl(selectedShipping.valor):''}`:'';
+  const msg=`Olá, gostaria de finalizar este pedido de consumíveis da RTD Soluções:\n\n${lines}${ship}\n\nTotal estimado: ${brl(grandTotal())}\n\nPoderia confirmar estoque e condições de entrega?`;
   window.open('https://wa.me/'+COMPANY_WA+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
 }
 async function startMercadoPagoCheckout(){
-  if(!cart.length||!mpConfigured)return;
+  if(!cart.length||!mpConfigured||!selectedShipping?.disponivel)return;
   const nome=$('#checkoutName').value.trim(),email=$('#checkoutEmail').value.trim(),whatsapp=$('#checkoutPhone').value.trim();
   $('#checkoutMsg').className='authmsg';$('#checkoutMsg').textContent='Criando pagamento seguro...';$('#mpCheckoutBtn').disabled=true;
   try{
-    const r=await fetch(PAYMENT_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'create_checkout',cliente_nome:nome,cliente_email:email,cliente_whatsapp:whatsapp,itens:cart.map(x=>({codigo:x.codigo,quantidade:x.quantidade}))})});
+    const s=await refreshSession().catch(()=>null);
+    const headers={'Content-Type':'application/json'};if(s?.access_token)headers.Authorization='Bearer '+s.access_token;
+    const delivery={...selectedShipping,...checkoutAddressPayload()};
+    const r=await fetch(PAYMENT_API,{method:'POST',headers,body:JSON.stringify({action:'create_checkout',cliente_nome:nome,cliente_email:email,cliente_whatsapp:whatsapp,itens:cart.map(x=>({codigo:x.codigo,quantidade:x.quantidade})),delivery})});
     const d=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(d.error||'ERRO'),{code:d.error,data:d});
     if(!d.init_point)throw Object.assign(new Error('SEM_LINK'),{code:'SEM_LINK'});
     window.location.href=d.init_point;
   }catch(e){
     $('#checkoutMsg').className='authmsg bad';
-    $('#checkoutMsg').textContent=e.code==='DADOS_INVALIDOS'?'Preencha nome, e-mail e WhatsApp corretamente.':e.code==='ESTOQUE_INSUFICIENTE'?'Um item ficou sem estoque. Atualize o carrinho.':e.code==='MERCADOPAGO_NAO_CONFIGURADO'?'As credenciais do Mercado Pago ainda não foram ativadas.':'Não foi possível iniciar o pagamento agora.';
-    $('#mpCheckoutBtn').disabled=!mpConfigured||!cart.length;
+    const msgs={DADOS_INVALIDOS:'Confira seus dados de contato.',ENDERECO_INCOMPLETO:'Complete o endereço de entrega.',CEP_INVALIDO:'Informe um CEP válido.',FRETE_INDISPONIVEL:'A opção de frete selecionada não está mais disponível. Calcule novamente.',ESTOQUE_INSUFICIENTE:'Um item ficou sem estoque. Atualize o carrinho.',MERCADOPAGO_NAO_CONFIGURADO:'As credenciais do Mercado Pago ainda não foram ativadas.'};
+    $('#checkoutMsg').textContent=msgs[e.code]||'Não foi possível iniciar o pagamento agora.';
+    $('#mpCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel;
   }
 }
 
@@ -781,7 +876,7 @@ $('#customerAlertHistory').onclick=async()=>{await markActiveCustomerAlertRead()
 $('#emailConfirmReturn').onclick=leaveEmailConfirmationScreen;
 $('#openCustomer').onclick=openCustomerModal;$('#closeCustomer').onclick=()=>$('#customerModal').classList.remove('open');
 $('#editCustomerProfile').onclick=showProfilePane;$('#openMyHistory').onclick=showHistoryPane;$('#backToStatus').onclick=showStatusPane;$('#customerLogoutHistory').onclick=()=>{$('#customerLogout').click()};$('#customerLogoutProfile').onclick=()=>{$('#customerLogout').click()};
-$('#customerLogin').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;$('#authMessage').className='authmsg';$('#authMessage').textContent='Entrando...';try{const d=await authFetch('/token?grant_type=password',{email,password});sessionSet(d);const prof=await customerProfileApi().catch(()=>({cliente:null}));if(prof?.cliente?.must_change_password){customer=prof.cliente;updateCustomerButton();await showPasswordPane();return}await loadCustomerStatus();$('#authMessage').className='authmsg ok';if(!customer||!customer.nome_completo||!customer.whatsapp)await showProfilePane();else showStatusPane();setTimeout(checkCustomerAlerts,120)}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.error_description||e?.data?.msg||e?.message||'').toLowerCase();if(msg.includes('invalid login')||msg.includes('invalid credentials'))$('#authMessage').textContent='E-mail ou senha incorretos.';else if(msg.includes('email not confirmed'))$('#authMessage').textContent='Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível entrar agora. Tente novamente em instantes.'}};
+$('#customerLogin').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;$('#authMessage').className='authmsg';$('#authMessage').textContent='Entrando...';try{const d=await authFetch('/token?grant_type=password',{email,password});sessionSet(d);const prof=await customerProfileApi().catch(()=>({cliente:null}));if(prof?.cliente?.must_change_password){customer=prof.cliente;updateCustomerButton();await showPasswordPane();return}await loadCustomerStatus();$('#authMessage').className='authmsg ok';if(!customer||!customer.nome_completo||!customer.whatsapp)await showProfilePane();else showStatusPane();setTimeout(checkCustomerAlerts,120);if($('#cartModal')?.classList.contains('open')){await autofillCheckoutProfile();await quoteShipping()}}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.error_description||e?.data?.msg||e?.message||'').toLowerCase();if(msg.includes('invalid login')||msg.includes('invalid credentials'))$('#authMessage').textContent='E-mail ou senha incorretos.';else if(msg.includes('email not confirmed'))$('#authMessage').textContent='Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível entrar agora. Tente novamente em instantes.'}};
 
 function startSignupCooldown(seconds=60){
   signupCooldownUntil=Date.now()+seconds*1000;
@@ -1025,7 +1120,7 @@ function renderAdminConsumables(){
   }).join(''):'<div class="loading">Nenhum consumível cadastrado.</div>';
 }
 async function clearConsumableForm(){
-  ['conCode','conName','conCategory','conDescription','conCost','conPrice','conStock','conMinStock','conImage'].forEach(id=>$('#'+id).value='');
+  ['conCode','conName','conCategory','conDescription','conCost','conPrice','conStock','conMinStock','conImage','conWeight','conHeight','conWidth','conLength'].forEach(id=>$('#'+id).value='');
   $('#conUnit').value='un';$('#conActive').value='true';$('#conCode').disabled=false;$('#consFormTitle').textContent='Novo consumível';$('#consFormMessage').className='authmsg';$('#consFormMessage').textContent='';$('#deleteConsumableAdmin').style.display='none';
   renderConsumableCompatibility([]);setConsumableNeeds([]);
   updateConsumablePreview();
@@ -1033,11 +1128,11 @@ async function clearConsumableForm(){
 }
 window.editConsumable=code=>{
   const c=adminConsumablesCache.find(x=>x.codigo===code);if(!c)return;
-  $('#consFormTitle').textContent='Editar '+c.codigo;$('#conCode').value=c.codigo;$('#conCode').disabled=true;$('#conName').value=c.nome||'';$('#conCategory').value=c.categoria||'';$('#conDescription').value=c.descricao||'';$('#conUnit').value=c.unidade||'un';$('#conCost').value=c.custo??0;$('#conPrice').value=c.preco_venda??0;$('#conStock').value=c.estoque_atual??0;$('#conMinStock').value=c.estoque_minimo??0;$('#conImage').value=c.imagem_key||'';$('#conActive').value=String(!!c.ativo);renderConsumableCompatibility((c.compatibilidades||[]).map(x=>x.equipamento_codigo));setConsumableNeeds(c.necessidades||[]);$('#deleteConsumableAdmin').style.display='inline-block';updateConsumablePreview();document.querySelector('.cons-form-card').scrollIntoView({behavior:'smooth',block:'start'});
+  $('#consFormTitle').textContent='Editar '+c.codigo;$('#conCode').value=c.codigo;$('#conCode').disabled=true;$('#conName').value=c.nome||'';$('#conCategory').value=c.categoria||'';$('#conDescription').value=c.descricao||'';$('#conUnit').value=c.unidade||'un';$('#conCost').value=c.custo??0;$('#conPrice').value=c.preco_venda??0;$('#conStock').value=c.estoque_atual??0;$('#conMinStock').value=c.estoque_minimo??0;$('#conImage').value=c.imagem_key||'';$('#conWeight').value=c.peso_kg??'';$('#conHeight').value=c.altura_cm??'';$('#conWidth').value=c.largura_cm??'';$('#conLength').value=c.comprimento_cm??'';$('#conActive').value=String(!!c.ativo);renderConsumableCompatibility((c.compatibilidades||[]).map(x=>x.equipamento_codigo));setConsumableNeeds(c.necessidades||[]);$('#deleteConsumableAdmin').style.display='inline-block';updateConsumablePreview();document.querySelector('.cons-form-card').scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function saveConsumableAdmin(){
   const password=sessionStorage.getItem('rtd_admin_pass');
-  const payload={action:'admin_upsert',password,codigo:$('#conCode').value,nome:$('#conName').value,categoria:$('#conCategory').value,descricao:$('#conDescription').value,unidade:$('#conUnit').value,custo:$('#conCost').value,preco_venda:$('#conPrice').value,estoque_atual:$('#conStock').value,estoque_minimo:$('#conMinStock').value,imagem_key:$('#conImage').value,ativo:$('#conActive').value==='true',compatibilidades:currentConsumableCompatibility(),necessidades:currentConsumableNeeds()};
+  const payload={action:'admin_upsert',password,codigo:$('#conCode').value,nome:$('#conName').value,categoria:$('#conCategory').value,descricao:$('#conDescription').value,unidade:$('#conUnit').value,custo:$('#conCost').value,preco_venda:$('#conPrice').value,estoque_atual:$('#conStock').value,estoque_minimo:$('#conMinStock').value,imagem_key:$('#conImage').value,ativo:$('#conActive').value==='true',compatibilidades:currentConsumableCompatibility(),necessidades:currentConsumableNeeds(),peso_kg:$('#conWeight').value,altura_cm:$('#conHeight').value,largura_cm:$('#conWidth').value,comprimento_cm:$('#conLength').value};
   $('#consFormMessage').className='authmsg';$('#consFormMessage').textContent='Salvando...';
   try{
     await consumableApi(payload);
@@ -1088,7 +1183,7 @@ window.saveConsumable=async codigo=>{
 window.saveInvestment=async codigo=>{const password=sessionStorage.getItem('rtd_admin_pass'),valor=Number($('#inv_'+CSS.escape(codigo)).value||0);try{await financeApi({action:'set_investment',password,equipamento_codigo:codigo,valor_investimento:valor});await loadFinance()}catch(e){alert('Não foi possível salvar o investimento.')}};
 window.deleteMovement=async id=>{if(!confirm('Excluir este lançamento financeiro?'))return;const password=sessionStorage.getItem('rtd_admin_pass');try{await financeApi({action:'delete_movement',password,id});await loadFinance()}catch(e){alert('Não foi possível excluir o lançamento.')}};
 async function addMovement(){const password=sessionStorage.getItem('rtd_admin_pass');const payload={action:'add_movement',password,tipo:$('#finType').value,categoria:$('#finCategory').value,descricao:$('#finDescription').value,valor:$('#finValue').value,data_competencia:$('#finDate').value,equipamento_codigo:$('#finEquipment').value,observacao:$('#finNote').value};try{await financeApi(payload);$('#finDescription').value='';$('#finValue').value='';$('#finNote').value='';await loadFinance()}catch(e){alert('Confira os campos do lançamento e tente novamente.')}}
-function switchAdminTab(tab){$$('.admintab').forEach(b=>b.classList.toggle('active',b.dataset.adminTab===tab));$$('.adminpane').forEach(p=>p.classList.remove('active'));const map={operation:'#adminPaneOperation',customers:'#adminPaneCustomers',equipment:'#adminPaneEquipment',consumables:'#adminPaneConsumables',finance:'#adminPaneFinance'};$(map[tab]||map.operation).classList.add('active');if(tab==='equipment'){loadAdminEquipment();if(!$('#eqCode').value)clearEquipmentForm()}if(tab==='consumables'){loadAdminConsumables();if(!$('#conCode').value)clearConsumableForm()}if(tab==='finance'){financeEquipOptions();if(!$('#financeFrom').value)financePeriodMonth();loadFinance()}}
+function switchAdminTab(tab){$$('.admintab').forEach(b=>b.classList.toggle('active',b.dataset.adminTab===tab));$$('.adminpane').forEach(p=>p.classList.remove('active'));const map={operation:'#adminPaneOperation',customers:'#adminPaneCustomers',equipment:'#adminPaneEquipment',consumables:'#adminPaneConsumables',finance:'#adminPaneFinance'};$(map[tab]||map.operation).classList.add('active');if(tab==='equipment'){loadAdminEquipment();if(!$('#eqCode').value)clearEquipmentForm()}if(tab==='consumables'){loadAdminConsumables();loadShippingAdmin();if(!$('#conCode').value)clearConsumableForm()}if(tab==='finance'){financeEquipOptions();if(!$('#financeFrom').value)financePeriodMonth();loadFinance()}}
 function customerForReservation(r){return adminCustomersCache.find(c=>c.id===r.cliente_id)||adminCustomersCache.find(c=>String(c.cpf)===String(r.cliente_cpf))||{}}
 function customerBaseExport(c){const t=customerTriage(c);return [c.nome_completo||'',c.cpf||'',c.data_nascimento||'',c.email||'',c.whatsapp||'',c.cep||'',c.endereco||'',c.numero||'',c.complemento||'',c.bairro||'',c.cidade||'',c.uf||'',c.status||'',c.nivel_risco||'',c.motivo_status||'',c.created_at||'',c.analisado_em||'',c.aprovado_em||'',t.result,t.alertas.join(' | ')]}
 function reservationExportPart(r){if(!r)return Array(18).fill('');const e=equipmentMeta(r.equipamento_codigo);return [r.codigo_reserva,r.equipamento_codigo,e.nome||'',e.categoria||'',e.descricao||'',e.nivel||'',r.servico||'',r.retirada,r.devolucao_prevista,r.devolucao_real||'',r.horas_contratadas,r.forma_pagamento,r.valor_locacao,r.caucao,r.multa_atraso||0,r.status,r.observacoes_internas||'',r.created_at||'']}
@@ -1102,11 +1197,31 @@ $$('[data-equip-filter]').forEach(btn=>btn.onclick=()=>{$$('[data-equip-filter]'
 
 $('#newEquipment').onclick=clearEquipmentForm;$('#refreshEquipment').onclick=async()=>{await loadAdmin();await loadAdminEquipment()};$('#saveEquipment').onclick=saveEquipment;$('#cancelEquipmentEdit').onclick=clearEquipmentForm;
 
-$('#cartBtn').onclick=()=>{$('#cartModal').classList.add('open');renderCart();checkMercadoPago()};
+
+let shippingRulesCache=[];
+async function loadShippingAdmin(){
+  const password=sessionStorage.getItem('rtd_admin_pass');if(!password)return;
+  try{const d=await shippingAdminApi({action:'admin_list',password});shippingRulesCache=d.regras||[];$('#shipOriginCep').value=d.config?.cep_origem||'';$('#shipPickupAddress').value=d.config?.retirada_endereco||'';$('#shipCorreiosServices').value=d.config?.correios_servicos||'03220,03298';$('#correiosAdminStatus').textContent=d.correios_secret_configured?'Credencial de acesso encontrada no backend.':'Aguardando credencial de contrato/chave de subdelegação dos Correios no backend.';renderShippingRules()}catch(e){$('#shippingRulesList').innerHTML='<div class="loading">Não foi possível carregar as configurações de frete.</div>'}
+}
+function renderShippingRules(){
+  const box=$('#shippingRulesList');if(!box)return;
+  if(!shippingRulesCache.length){box.innerHTML='<div class="loading">Nenhuma faixa cadastrada. A entrega própria ficará indisponível até você criar pelo menos uma faixa de CEP.</div>';return}
+  box.innerHTML=shippingRulesCache.map(r=>`<div class="shipping-rule"><div><b>${esc(r.nome)}</b><small>CEP ${String(r.cep_inicio).padStart(8,'0')} a ${String(r.cep_fim).padStart(8,'0')} • ${brl(r.valor)}${r.prazo_dias!=null?' • '+r.prazo_dias+' dia(s)':''} • ${r.ativo?'Ativa':'Inativa'}</small></div><div class="shipping-rule-actions"><button onclick="editShippingRule('${r.id}')">Editar</button><button onclick="deleteShippingRule('${r.id}')">Excluir</button></div></div>`).join('');
+}
+window.editShippingRule=id=>{const r=shippingRulesCache.find(x=>x.id===id);if(!r)return;$('#shipRuleId').value=r.id;$('#shipRuleName').value=r.nome;$('#shipRuleStart').value=String(r.cep_inicio).padStart(8,'0');$('#shipRuleEnd').value=String(r.cep_fim).padStart(8,'0');$('#shipRuleValue').value=r.valor;$('#shipRuleDays').value=r.prazo_dias??'';$('#shipRulePriority').value=r.prioridade??100;$('#shipRuleActive').value=String(!!r.ativo)};
+window.deleteShippingRule=async id=>{if(!confirm('Excluir esta faixa de entrega própria?'))return;const password=sessionStorage.getItem('rtd_admin_pass');try{await shippingAdminApi({action:'admin_delete_rule',password,id});await loadShippingAdmin()}catch{alert('Não foi possível excluir a faixa.')}};
+function clearShippingRule(){['shipRuleId','shipRuleName','shipRuleStart','shipRuleEnd','shipRuleValue','shipRuleDays'].forEach(id=>$('#'+id).value='');$('#shipRulePriority').value='100';$('#shipRuleActive').value='true';$('#shippingRuleMsg').textContent=''}
+async function saveShippingRule(){const password=sessionStorage.getItem('rtd_admin_pass');const payload={action:'admin_upsert_rule',password,id:$('#shipRuleId').value,nome:$('#shipRuleName').value,cep_inicio:$('#shipRuleStart').value,cep_fim:$('#shipRuleEnd').value,valor:$('#shipRuleValue').value,prazo_dias:$('#shipRuleDays').value,prioridade:$('#shipRulePriority').value,ativo:$('#shipRuleActive').value==='true'};$('#shippingRuleMsg').textContent='Salvando...';try{await shippingAdminApi(payload);$('#shippingRuleMsg').className='authmsg ok';$('#shippingRuleMsg').textContent='Faixa salva.';clearShippingRule();await loadShippingAdmin()}catch(e){$('#shippingRuleMsg').className='authmsg bad';$('#shippingRuleMsg').textContent='Confira CEP inicial/final e valor.'}}
+async function saveShippingSettings(){const password=sessionStorage.getItem('rtd_admin_pass');$('#shippingSettingsMsg').textContent='Salvando...';try{await shippingAdminApi({action:'admin_save_settings',password,cep_origem:$('#shipOriginCep').value,retirada_endereco:$('#shipPickupAddress').value,correios_servicos:$('#shipCorreiosServices').value});$('#shippingSettingsMsg').className='authmsg ok';$('#shippingSettingsMsg').textContent='Configurações salvas.';await loadShippingAdmin()}catch(e){$('#shippingSettingsMsg').className='authmsg bad';$('#shippingSettingsMsg').textContent='Confira o CEP de origem.'}}
+
+$('#cartBtn').onclick=async()=>{$('#cartModal').classList.add('open');renderCart();await autofillCheckoutProfile();await quoteShipping();checkMercadoPago()};
 $('#closeCart').onclick=()=>$('#cartModal').classList.remove('open');
+$('#calcShippingBtn').onclick=quoteShipping;
+$('#checkoutCep').addEventListener('change',quoteShipping);
 $('#cartModal').addEventListener('click',e=>{if(e.target===$('#cartModal'))$('#cartModal').classList.remove('open')});
 $('#cartWhatsAppBtn').onclick=cartWhatsApp;
 $('#mpCheckoutBtn').onclick=startMercadoPagoCheckout;
+$('#refreshShippingAdmin').onclick=loadShippingAdmin;$('#saveShippingSettings').onclick=saveShippingSettings;$('#saveShippingRule').onclick=saveShippingRule;$('#clearShippingRule').onclick=clearShippingRule;
 
 $('#newConsumable').onclick=clearConsumableForm;$('#refreshConsumables').onclick=loadAdminConsumables;$('#saveConsumableAdmin').onclick=saveConsumableAdmin;$('#cancelConsumableEdit').onclick=clearConsumableForm;$('#deleteConsumableAdmin').onclick=()=>deleteConsumable($('#conCode').value);['conCode','conName','conCategory','conImage','conStock','conPrice','conActive'].forEach(id=>$('#'+id)?.addEventListener('input',updateConsumablePreview));$('#conActive')?.addEventListener('change',updateConsumablePreview);
 window.exportCustomer=id=>{const c=adminCustomersCache.find(x=>x.id===id);if(!c)return alert('Cliente não encontrado.');const rows=fullExportRows(id);csvDownload(`RTD_cliente_${String(c.nome_completo||'cliente').replace(/[^a-z0-9]+/gi,'_')}_historico.csv`,FULL_HEADERS,rows)};
