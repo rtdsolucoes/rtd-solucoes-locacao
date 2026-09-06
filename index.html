@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="RTD Soluções | Locação de ferramentas por hora para pessoas físicas, com reserva online, gestão de consumíveis e acompanhamento da locação.">
 <meta name="referrer" content="no-referrer">
-<link rel="canonical" href="https://rtd-solucoes-locacoes.vercel.app/">
+<link rel="canonical" href="https://solucoesrtd.com.br/">
 <meta property="og:title" content="RTD Soluções | Locação de Ferramentas">
 <meta property="og:description" content="Reserve ferramentas por hora e consulte consumíveis compatíveis.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://rtd-solucoes-locacoes.vercel.app/">
+<meta property="og:url" content="https://solucoesrtd.com.br/">
 <title>RTD Soluções | Locação de Ferramentas</title>
 <!-- RTD Site v1.3.0 -->
 <style>
@@ -236,7 +236,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const brl=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
 let tools=FALLBACK_TOOLS.slice(),selected=null,adminRowsCache=[],adminCustomersCache=[],adminEquipmentCache=[],adminConsumablesCache=[],consumableEquipmentCache=[],financeCache=null,customer=null,pendingReservation=null,reservationConsumables=[];
 const AUTH_URL='https://tgbxpvfbcmemmyzhjpeq.supabase.co/auth/v1';
-const PUBLIC_SITE_URL='https://rtd-solucoes-locacoes.vercel.app/';
+const PUBLIC_SITE_URL='https://solucoesrtd.com.br/';
 function emailConfirmationRedirect(){
   const u=new URL(PUBLIC_SITE_URL);
   u.searchParams.set('email_verified','1');
