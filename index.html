@@ -217,40 +217,60 @@ const AUTH_URL='https://tgbxpvfbcmemmyzhjpeq.supabase.co/auth/v1';
 const sessionGet=()=>{try{return JSON.parse(localStorage.getItem('rtd_customer_session')||'null')}catch{return null}};
 const sessionSet=s=>s?localStorage.setItem('rtd_customer_session',JSON.stringify(s)):localStorage.removeItem('rtd_customer_session');
 
+const PUBLIC_SITE_URL='https://rtd-solucoes-locacoes.vercel.app/';
 function emailConfirmRedirectUrl(){
-  const u=new URL(window.location.href);
-  u.search='';
-  u.hash='';
+  const u=new URL(PUBLIC_SITE_URL);
   u.searchParams.set('email_verified','1');
   return u.toString();
 }
 function showEmailVerificationLanding(){
   const q=new URLSearchParams(location.search);
   const h=new URLSearchParams((location.hash||'').replace(/^#/,''));
-  const verified=q.get('email_verified')==='1';
+  const callbackType=(q.get('type')||h.get('type')||'').toLowerCase();
+  const hasAuthCallback=!!(h.get('access_token')||q.get('code')||h.get('refresh_token')||callbackType==='signup'||callbackType==='email');
+  const verified=q.get('email_verified')==='1'||hasAuthCallback;
   const err=q.get('error')||h.get('error');
   const errCode=q.get('error_code')||h.get('error_code');
   const errDesc=q.get('error_description')||h.get('error_description');
+
+  // Supabase implicit-flow confirmation may return the session in the URL hash.
+  // Adopt it before cleaning the URL so the customer can continue without losing the confirmed session.
+  if(h.get('access_token')){
+    const expiresIn=Number(h.get('expires_in')||3600);
+    const sess={
+      access_token:h.get('access_token'),
+      refresh_token:h.get('refresh_token')||'',
+      token_type:h.get('token_type')||'bearer',
+      expires_in:expiresIn,
+      expires_at:Math.floor(Date.now()/1000)+expiresIn
+    };
+    try{sessionSet(sess)}catch{}
+  }
+
   if(!verified&&!err)return;
   const screen=$('#emailVerifyScreen'),icon=$('#emailVerifyIcon'),title=$('#emailVerifyTitle'),text=$('#emailVerifyText');
   if(err){
     icon.textContent='!';
     icon.classList.add('error');
     title.textContent='Não foi possível confirmar o e-mail';
-    const expired=String(errCode||errDesc||'').toLowerCase().includes('expired');
-    text.textContent=expired?'Este link de verificação expirou ou já foi utilizado. Volte ao site e solicite uma nova confirmação de e-mail.':'A confirmação não pôde ser concluída. Volte ao site e tente novamente.';
+    const detail=String(errCode||errDesc||'').toLowerCase();
+    const expired=detail.includes('expired')||detail.includes('invalid');
+    text.textContent=expired?'Este link de verificação expirou, já foi utilizado ou não é mais válido. Volte ao site e solicite uma nova confirmação de e-mail.':'A confirmação não pôde ser concluída. Volte ao site e tente novamente.';
   }else{
     icon.textContent='✓';
     icon.classList.remove('error');
     title.textContent='E-mail verificado com sucesso!';
-    text.textContent='Seu endereço de e-mail foi confirmado. Agora você pode retornar ao site da RTD Soluções e continuar seu cadastro ou fazer login.';
+    text.textContent='Seu endereço de e-mail foi confirmado. Você já pode retornar à RTD Soluções e continuar seu cadastro ou acessar sua conta.';
   }
   screen.classList.add('open');
-}
-function closeEmailVerificationLanding(){
+}function closeEmailVerificationLanding(){
   $('#emailVerifyScreen')?.classList.remove('open');
+  if(location.origin!==new URL(PUBLIC_SITE_URL).origin){
+    location.href=PUBLIC_SITE_URL;
+    return;
+  }
   const u=new URL(location.href);
-  ['email_verified','error','error_code','error_description'].forEach(k=>u.searchParams.delete(k));
+  ['email_verified','error','error_code','error_description','code','type'].forEach(k=>u.searchParams.delete(k));
   u.hash='';
   history.replaceState({},'',u.pathname+(u.search||''));
   window.scrollTo({top:0,behavior:'smooth'});
