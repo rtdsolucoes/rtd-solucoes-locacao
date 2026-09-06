@@ -40,7 +40,16 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 .foot img{width:88px;height:68px;object-fit:cover;border-radius:10px;border:1px solid #2d373c}.foot small{color:#929ea4}
 .modal{position:fixed;inset:0;background:#000b;z-index:100;display:none;place-items:center;padding:14px}
 #adminCustomerCreateModal,#customerDetailModal{z-index:180}
-#reservationDoneModal{z-index:190}#customerAlertModal{z-index:215}.customer-alert-card{width:min(560px,100%)}.customer-alert-icon{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:#fff3cd;font-size:30px}.customer-alert-card h2{text-align:center;margin:0 0 8px}.customer-alert-card .sub{text-align:center}.customer-alert-message{margin-top:16px;padding:16px;border:1px solid #ead7a0;border-radius:14px;background:#fffaf0;line-height:1.5}.customer-alert-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.customer-alert-actions>*{flex:1}.customer-alert-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#b42318;color:#fff;font-size:12px;font-weight:800;margin-left:6px}.reservation-done-card{width:min(560px,100%);text-align:center}.reservation-check{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;background:#eef8f3;color:#17653d;font-size:38px;font-weight:900}.reservation-done-card h2{margin:0 0 8px}.reservation-done-card .statusbox{text-align:left}.reservation-done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.reservation-done-actions>*{flex:1}.modal.open{display:grid}.modal-card{width:min(680px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:21px;padding:23px}
+#reservationDoneModal{z-index:190}#customerAlertModal{z-index:215}#emailVerifyScreen{position:fixed;inset:0;z-index:500;background:linear-gradient(135deg,#f7f9f9,#eef3f4);display:none;align-items:center;justify-content:center;padding:22px}
+#emailVerifyScreen.open{display:flex}
+.email-verify-card{width:min(560px,100%);background:#fff;border:1px solid #dfe6e8;border-radius:22px;padding:30px;box-shadow:0 24px 70px #10202724;text-align:center}
+.email-verify-icon{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;background:#eaf8ef;color:#14733f;font-size:40px;font-weight:900}
+.email-verify-icon.error{background:#fdecec;color:#a22f2f}
+.email-verify-card h1{margin:0 0 10px;font-size:28px;color:#162229}
+.email-verify-card p{margin:0 auto 12px;max-width:460px;color:#617078;line-height:1.55}
+.email-verify-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.email-verify-actions .confirm,.email-verify-actions .smallbtn{min-width:190px}
+.email-verify-brand{font-size:12px;font-weight:900;letter-spacing:.08em;color:#7a878d;margin-bottom:18px}.customer-alert-card{width:min(560px,100%)}.customer-alert-icon{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px;background:#fff3cd;font-size:30px}.customer-alert-card h2{text-align:center;margin:0 0 8px}.customer-alert-card .sub{text-align:center}.customer-alert-message{margin-top:16px;padding:16px;border:1px solid #ead7a0;border-radius:14px;background:#fffaf0;line-height:1.5}.customer-alert-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.customer-alert-actions>*{flex:1}.customer-alert-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#b42318;color:#fff;font-size:12px;font-weight:800;margin-left:6px}.reservation-done-card{width:min(560px,100%);text-align:center}.reservation-check{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;background:#eef8f3;color:#17653d;font-size:38px;font-weight:900}.reservation-done-card h2{margin:0 0 8px}.reservation-done-card .statusbox{text-align:left}.reservation-done-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.reservation-done-actions>*{flex:1}.modal.open{display:grid}.modal-card{width:min(680px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:21px;padding:23px}
 .mhead{display:flex;justify-content:space-between;gap:14px}.close{width:38px;height:38px;border:0;border-radius:50%;background:#edf1f2;font-size:20px;cursor:pointer}
 .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}.field label{display:block;font-size:12px;font-weight:850;margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border:1px solid #d6dde0;border-radius:9px}
 .field.full{grid-column:1/-1}.avail{margin-top:12px;padding:12px;border-radius:12px;background:#eef8f3;color:#17653d;font-size:13px;font-weight:800;line-height:1.45}.avail.bad{background:#fff0f0;color:#922f2f}
@@ -137,6 +146,17 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 
 <div class="modal customer-detail-modal" id="customerDetailModal"><div class="modal-card" style="width:min(1040px,100%)"><div class="mhead"><div><div class="eyebrow">FICHA COMPLETA DO CLIENTE</div><h2 id="detailClientName">—</h2><p class="sub">Cadastro, análise atual e histórico de equipamentos reservados.</p></div><button class="close" id="closeCustomerDetail">×</button></div><div id="customerDetailContent"></div></div></div>
 
+<div id="emailVerifyScreen" aria-live="polite">
+  <div class="email-verify-card">
+    <div class="email-verify-brand">RTD SOLUÇÕES • LOCAÇÃO DE FERRAMENTAS</div>
+    <div class="email-verify-icon" id="emailVerifyIcon">✓</div>
+    <h1 id="emailVerifyTitle">E-mail verificado com sucesso!</h1>
+    <p id="emailVerifyText">Seu endereço de e-mail foi confirmado. Agora você pode retornar ao site e continuar seu cadastro ou fazer login.</p>
+    <div class="email-verify-actions">
+      <button class="confirm" id="emailVerifyReturn">Voltar para RTD Soluções</button>
+    </div>
+  </div>
+</div>
 <section class="admin" id="admin"><div class="admintop"><div class="admintopin"><div><b>RTD SOLUÇÕES — Gestão</b><div style="font-size:12px;color:#aeb8bd">Operação, clientes, equipamentos e indicadores financeiros</div></div><button class="adminbtn" id="closeAdmin">Sair</button></div><div class="adminnav"><button class="admintab active" data-admin-tab="operation">Reservas</button><button class="admintab" data-admin-tab="customers">Clientes</button><button class="admintab" data-admin-tab="equipment">Equipamentos</button><button class="admintab" data-admin-tab="finance">Financeiro</button></div></div><div class="adminbody">
 <div class="adminpane active" id="adminPaneOperation">
 <div class="stats"><div class="stat"><span>Reservas</span><b id="statTotal">0</b></div><div class="stat"><span>Ativas</span><b id="statActive">0</b></div><div class="stat"><span>Receita prevista</span><b id="statRevenue">R$ 0</b></div><div class="stat"><span>Cauções</span><b id="statDeposits">R$ 0</b></div></div>
@@ -196,6 +216,46 @@ let tools=FALLBACK_TOOLS.slice(),selected=null,adminRowsCache=[],adminCustomersC
 const AUTH_URL='https://tgbxpvfbcmemmyzhjpeq.supabase.co/auth/v1';
 const sessionGet=()=>{try{return JSON.parse(localStorage.getItem('rtd_customer_session')||'null')}catch{return null}};
 const sessionSet=s=>s?localStorage.setItem('rtd_customer_session',JSON.stringify(s)):localStorage.removeItem('rtd_customer_session');
+
+function emailConfirmRedirectUrl(){
+  const u=new URL(window.location.href);
+  u.search='';
+  u.hash='';
+  u.searchParams.set('email_verified','1');
+  return u.toString();
+}
+function showEmailVerificationLanding(){
+  const q=new URLSearchParams(location.search);
+  const h=new URLSearchParams((location.hash||'').replace(/^#/,''));
+  const verified=q.get('email_verified')==='1';
+  const err=q.get('error')||h.get('error');
+  const errCode=q.get('error_code')||h.get('error_code');
+  const errDesc=q.get('error_description')||h.get('error_description');
+  if(!verified&&!err)return;
+  const screen=$('#emailVerifyScreen'),icon=$('#emailVerifyIcon'),title=$('#emailVerifyTitle'),text=$('#emailVerifyText');
+  if(err){
+    icon.textContent='!';
+    icon.classList.add('error');
+    title.textContent='Não foi possível confirmar o e-mail';
+    const expired=String(errCode||errDesc||'').toLowerCase().includes('expired');
+    text.textContent=expired?'Este link de verificação expirou ou já foi utilizado. Volte ao site e solicite uma nova confirmação de e-mail.':'A confirmação não pôde ser concluída. Volte ao site e tente novamente.';
+  }else{
+    icon.textContent='✓';
+    icon.classList.remove('error');
+    title.textContent='E-mail verificado com sucesso!';
+    text.textContent='Seu endereço de e-mail foi confirmado. Agora você pode retornar ao site da RTD Soluções e continuar seu cadastro ou fazer login.';
+  }
+  screen.classList.add('open');
+}
+function closeEmailVerificationLanding(){
+  $('#emailVerifyScreen')?.classList.remove('open');
+  const u=new URL(location.href);
+  ['email_verified','error','error_code','error_description'].forEach(k=>u.searchParams.delete(k));
+  u.hash='';
+  history.replaceState({},'',u.pathname+(u.search||''));
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>$('#openCustomer')?.click(),250);
+}
 async function authFetch(path,body){const r=await fetch(AUTH_URL+path,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.msg||d.error_description||d.error||'ERRO_AUTH'),{code:d.error||'ERRO_AUTH',status:r.status});return d}
 async function refreshSession(){const s=sessionGet();if(!s?.refresh_token)return null;if(s.expires_at&&Date.now()/1000<s.expires_at-60)return s;try{const d=await authFetch('/token?grant_type=refresh_token',{refresh_token:s.refresh_token});sessionSet(d);return d}catch{sessionSet(null);customer=null;return null}}
 const api=async(payload,useCustomer=false)=>{const s=useCustomer?await refreshSession():null;const token=s?.access_token||ANON;const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok) throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;};
@@ -268,10 +328,11 @@ async function openCustomerModal(){await loadCustomerStatus();$('#customerModal'
 async function requestReservation(code,h){pendingReservation={code,h};await loadCustomerStatus();if(customer?.status==='Aprovado'){openModal(code,h);return}await openCustomerModal()}
 $('#customerAlertRead').onclick=markActiveCustomerAlertRead;
 $('#customerAlertHistory').onclick=async()=>{await markActiveCustomerAlertRead();$('#customerModal').classList.add('open');await showHistoryPane()};
+$('#emailVerifyReturn').onclick=closeEmailVerificationLanding;
 $('#openCustomer').onclick=openCustomerModal;$('#closeCustomer').onclick=()=>$('#customerModal').classList.remove('open');
 $('#editCustomerProfile').onclick=showProfilePane;$('#openMyHistory').onclick=showHistoryPane;$('#backToStatus').onclick=showStatusPane;$('#customerLogoutHistory').onclick=()=>{$('#customerLogout').click()};$('#customerLogoutProfile').onclick=()=>{$('#customerLogout').click()};
 $('#customerLogin').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;$('#authMessage').className='authmsg';$('#authMessage').textContent='Entrando...';try{const d=await authFetch('/token?grant_type=password',{email,password});sessionSet(d);const prof=await customerProfileApi().catch(()=>({cliente:null}));if(prof?.cliente?.must_change_password){customer=prof.cliente;updateCustomerButton();await showPasswordPane();return}await loadCustomerStatus();$('#authMessage').className='authmsg ok';if(!customer||!customer.nome_completo||!customer.whatsapp)await showProfilePane();else showStatusPane();setTimeout(checkCustomerAlerts,120)}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.error_description||e?.data?.msg||e?.message||'').toLowerCase();if(msg.includes('invalid login')||msg.includes('invalid credentials'))$('#authMessage').textContent='E-mail ou senha incorretos.';else if(msg.includes('email not confirmed'))$('#authMessage').textContent='Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível entrar agora. Tente novamente em instantes.'}};
-$('#customerSignup').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;const hasSpecial=/[^A-Za-z0-9]/.test(password);if(password.length<8||!hasSpecial){$('#authMessage').className='authmsg bad';$('#authMessage').textContent='A senha deve ter no mínimo 8 caracteres e pelo menos 1 caractere especial, como ! @ # $ % & * ?.';return}$('#authMessage').className='authmsg';$('#authMessage').textContent='Criando acesso...';try{const d=await authFetch('/signup',{email,password});if(d.access_token){sessionSet(d);customer=null;await showProfilePane()}else{$('#authMessage').className='authmsg ok';$('#authMessage').textContent='Acesso criado. Confira seu e-mail para confirmar a conta e depois entre novamente.'}}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.msg||e?.data?.error_description||e?.message||'').toLowerCase();if(msg.includes('already')||msg.includes('registered')||msg.includes('exists'))$('#authMessage').textContent='Este e-mail já possui um acesso. Use o botão Entrar.';else if(msg.includes('password'))$('#authMessage').textContent='A senha foi recusada. Use pelo menos 8 caracteres e um caractere especial.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível criar o acesso agora. Tente novamente em instantes.'}};
+$('#customerSignup').onclick=async()=>{const email=$('#authEmail').value.trim().toLowerCase(),password=$('#authPassword').value;const hasSpecial=/[^A-Za-z0-9]/.test(password);if(password.length<8||!hasSpecial){$('#authMessage').className='authmsg bad';$('#authMessage').textContent='A senha deve ter no mínimo 8 caracteres e pelo menos 1 caractere especial, como ! @ # $ % & * ?.';return}$('#authMessage').className='authmsg';$('#authMessage').textContent='Criando acesso...';try{const d=await authFetch('/signup?redirect_to='+encodeURIComponent(emailConfirmRedirectUrl()),{email,password});if(d.access_token){sessionSet(d);customer=null;await showProfilePane()}else{$('#authMessage').className='authmsg ok';$('#authMessage').textContent='Acesso criado. Confira seu e-mail para confirmar a conta e depois entre novamente.'}}catch(e){$('#authMessage').className='authmsg bad';const msg=String(e?.data?.msg||e?.data?.error_description||e?.message||'').toLowerCase();if(msg.includes('already')||msg.includes('registered')||msg.includes('exists'))$('#authMessage').textContent='Este e-mail já possui um acesso. Use o botão Entrar.';else if(msg.includes('password'))$('#authMessage').textContent='A senha foi recusada. Use pelo menos 8 caracteres e um caractere especial.';else if(e?.status===429||msg.includes('rate'))$('#authMessage').textContent='Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';else $('#authMessage').textContent='Não foi possível criar o acesso agora. Tente novamente em instantes.'}};
 $('#saveFirstPassword').onclick=async()=>{const p1=$('#firstNewPassword').value,p2=$('#firstNewPassword2').value;const hasSpecial=/[^A-Za-z0-9]/.test(p1);if(p1.length<8||!hasSpecial){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='A nova senha deve ter no mínimo 8 caracteres e pelo menos 1 caractere especial.';return}if(p1!==p2){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='As duas senhas não coincidem.';return}const sess=await refreshSession();if(!sess?.access_token){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='Sua sessão expirou. Entre novamente.';return}$('#firstPasswordMessage').className='authmsg';$('#firstPasswordMessage').textContent='Salvando nova senha...';try{const r=await fetch(AUTH_URL+'/user',{method:'PUT',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+sess.access_token},body:JSON.stringify({password:p1})});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.msg||d.error_description||'ERRO'),{status:r.status,data:d});await customerProfileApi({action:'password_changed'});customer=null;await loadCustomerStatus();$('#firstPasswordMessage').className='authmsg ok';$('#firstPasswordMessage').textContent='Senha alterada com sucesso.';if(!customer||!customer.cpf||!customer.whatsapp)await showProfilePane();else showStatusPane()}catch(e){$('#firstPasswordMessage').className='authmsg bad';$('#firstPasswordMessage').textContent='Não foi possível alterar a senha. Escolha uma senha diferente da temporária e tente novamente.'}};
 const firstPassLogout=()=>{sessionSet(null);customer=null;pendingReservation=null;$('#authEmail').value='';$('#authPassword').value='';updateCustomerButton();showAuthPane()};
 $('#logoutFirstPassword').onclick=firstPassLogout;
@@ -431,6 +492,7 @@ $$('[data-equip-filter]').forEach(btn=>btn.onclick=()=>{$$('[data-equip-filter]'
 
 $('#newEquipment').onclick=clearEquipmentForm;$('#refreshEquipment').onclick=async()=>{await loadAdmin();await loadAdminEquipment()};$('#saveEquipment').onclick=saveEquipment;$('#cancelEquipmentEdit').onclick=clearEquipmentForm;
 window.exportCustomer=id=>{const c=adminCustomersCache.find(x=>x.id===id);if(!c)return alert('Cliente não encontrado.');const rows=fullExportRows(id);csvDownload(`RTD_cliente_${String(c.nome_completo||'cliente').replace(/[^a-z0-9]+/gi,'_')}_historico.csv`,FULL_HEADERS,rows)};
+showEmailVerificationLanding();
 loadCatalog();loadCustomerStatus();
 
 $$('.admintab').forEach(b=>b.addEventListener('click',()=>switchAdminTab(b.dataset.adminTab)));
