@@ -1,33 +1,4 @@
-<
-function updateDistanceFormulaPreview(){
-  const base=Math.max(0,Number($('#shipBaseCost')?.value||0)),km=Math.max(.01,Number($('#shipBaseKm')?.value||8)),fixed=Math.max(0,Number($('#shipFixedFee')?.value||0)),min=Math.max(0,Number($('#shipMinValue')?.value||0)),mult=Math.max(0,Number($('#shipMultiplier')?.value||1));
-  const unit=base/km;
-  if($('#shipCostPerKm'))$('#shipCostPerKm').textContent=brl(unit).replace('R$ ','R$ ')+'/km';
-  if($('#shipFormulaPreview'))$('#shipFormulaPreview').textContent=`max(R$ ${min.toFixed(2).replace('.',',')}, ((R$ ${base.toFixed(2).replace('.',',')} ÷ ${km} km) × distância × ${mult}) + R$ ${fixed.toFixed(2).replace('.',',')})`;
-}
-async function saveDistanceFormula(){
-  const password=sessionStorage.getItem('rtd_admin_pass');$('#distanceFormulaMsg').textContent='Salvando...';
-  try{
-    await shippingAdminApi({action:'admin_save_distance_formula',password,modo:$('#shipCalcMode').value,custo_base:$('#shipBaseCost').value,km_base:$('#shipBaseKm').value,taxa_fixa:$('#shipFixedFee').value,valor_minimo:$('#shipMinValue').value,multiplicador:$('#shipMultiplier').value,prazo_dias:$('#shipDistanceDays').value});
-    $('#distanceFormulaMsg').className='authmsg ok';$('#distanceFormulaMsg').textContent='Fórmula de frete salva.';updateDistanceFormulaPreview();await loadShippingAdmin();
-  }catch(e){$('#distanceFormulaMsg').className='authmsg bad';$('#distanceFormulaMsg').textContent='Não foi possível salvar a fórmula.'}
-}
-async function testDistanceFormula(){
-  const password=sessionStorage.getItem('rtd_admin_pass'),cep=$('#shipTestCep').value;
-  const box=$('#distanceTestResult');box.className='formula-test-result';box.textContent='Calculando rota e frete...';
-  try{
-    const d=await shippingAdminApi({action:'admin_test_distance',password,cep_destino:cep}),q=d.cotacao;
-    if(!q){box.textContent='Não foi possível calcular a rota para este CEP.';return}
-    box.className='formula-test-result ok';
-    box.innerHTML=`<b>${esc(q.servico)}</b><br>Distância estimada: <b>${Number(q.distancia_km||0).toFixed(2).replace('.',',')} km</b><br>Valor calculado: <b>${brl(q.valor)}</b><br><small>${esc(q.formula||'')}</small>`;
-  }catch(e){box.textContent='Não foi possível calcular a distância para este CEP.'}
-}
-async function clearDistanceCache(){
-  if(!confirm('Limpar o cache de distâncias? Novas cotações serão recalculadas.'))return;
-  const password=sessionStorage.getItem('rtd_admin_pass');
-  try{await shippingAdminApi({action:'admin_clear_distance_cache',password});$('#distanceFormulaMsg').className='authmsg ok';$('#distanceFormulaMsg').textContent='Cache de distâncias limpo.'}catch{$('#distanceFormulaMsg').className='authmsg bad';$('#distanceFormulaMsg').textContent='Não foi possível limpar o cache.'}
-}
-!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -1307,6 +1278,73 @@ function clearShippingRule(){['shipRuleId','shipRuleName','shipRuleStart','shipR
 async function saveShippingRule(){const password=sessionStorage.getItem('rtd_admin_pass');const payload={action:'admin_upsert_rule',password,id:$('#shipRuleId').value,nome:$('#shipRuleName').value,cep_inicio:$('#shipRuleStart').value,cep_fim:$('#shipRuleEnd').value,valor:$('#shipRuleValue').value,prazo_dias:$('#shipRuleDays').value,prioridade:$('#shipRulePriority').value,ativo:$('#shipRuleActive').value==='true'};$('#shippingRuleMsg').textContent='Salvando...';try{await shippingAdminApi(payload);$('#shippingRuleMsg').className='authmsg ok';$('#shippingRuleMsg').textContent='Faixa salva.';clearShippingRule();await loadShippingAdmin()}catch(e){$('#shippingRuleMsg').className='authmsg bad';$('#shippingRuleMsg').textContent='Confira CEP inicial/final e valor.'}}
 async function saveShippingSettings(){const password=sessionStorage.getItem('rtd_admin_pass');$('#shippingSettingsMsg').textContent='Salvando...';try{await shippingAdminApi({action:'admin_save_settings',password,cep_origem:$('#shipOriginCep').value,retirada_endereco:$('#shipPickupAddress').value,correios_servicos:$('#shipCorreiosServices').value});$('#shippingSettingsMsg').className='authmsg ok';$('#shippingSettingsMsg').textContent='Configurações salvas.';await loadShippingAdmin()}catch(e){$('#shippingSettingsMsg').className='authmsg bad';$('#shippingSettingsMsg').textContent='Confira o CEP de origem.'}}
 
+
+function updateDistanceFormulaPreview(){
+  const base=Math.max(0,Number($('#shipBaseCost')?.value||0));
+  const km=Math.max(0.01,Number($('#shipBaseKm')?.value||8));
+  const fixed=Math.max(0,Number($('#shipFixedFee')?.value||0));
+  const min=Math.max(0,Number($('#shipMinValue')?.value||0));
+  const mult=Math.max(0,Number($('#shipMultiplier')?.value||1));
+  const unit=base/km;
+  if($('#shipCostPerKm')) $('#shipCostPerKm').textContent='R$ '+unit.toFixed(4).replace('.',',')+'/km';
+  if($('#shipFormulaPreview')) $('#shipFormulaPreview').textContent=
+    `max(R$ ${min.toFixed(2).replace('.',',')}, ((R$ ${base.toFixed(2).replace('.',',')} ÷ ${km.toString().replace('.',',')} km) × distância × ${mult.toString().replace('.',',')}) + R$ ${fixed.toFixed(2).replace('.',',')})`;
+}
+async function saveDistanceFormula(){
+  const password=sessionStorage.getItem('rtd_admin_pass');
+  const msg=$('#distanceFormulaMsg');
+  if(msg){msg.className='authmsg';msg.textContent='Salvando...'}
+  try{
+    await shippingAdminApi({
+      action:'admin_save_distance_formula',
+      password,
+      modo:$('#shipCalcMode').value,
+      custo_base:$('#shipBaseCost').value,
+      km_base:$('#shipBaseKm').value,
+      taxa_fixa:$('#shipFixedFee').value,
+      valor_minimo:$('#shipMinValue').value,
+      multiplicador:$('#shipMultiplier').value,
+      prazo_dias:$('#shipDistanceDays').value
+    });
+    if(msg){msg.className='authmsg ok';msg.textContent='Fórmula de frete salva.'}
+    updateDistanceFormulaPreview();
+    await loadShippingAdmin();
+  }catch(e){
+    console.error('Erro ao salvar fórmula de frete',e);
+    if(msg){msg.className='authmsg bad';msg.textContent='Não foi possível salvar a fórmula.'}
+  }
+}
+async function testDistanceFormula(){
+  const password=sessionStorage.getItem('rtd_admin_pass');
+  const cep=$('#shipTestCep').value;
+  const box=$('#distanceTestResult');
+  if(!box)return;
+  box.className='formula-test-result';
+  box.textContent='Calculando rota e frete...';
+  try{
+    const d=await shippingAdminApi({action:'admin_test_distance',password,cep_destino:cep});
+    const q=d?.cotacao;
+    if(!q){box.textContent='Não foi possível calcular a rota para este CEP.';return}
+    box.className='formula-test-result ok';
+    box.innerHTML=`<b>${esc(q.servico||'Entrega própria RTD')}</b><br>Distância estimada: <b>${Number(q.distancia_km||0).toFixed(2).replace('.',',')} km</b><br>Valor calculado: <b>${brl(q.valor||0)}</b>${q.formula?`<br><small>${esc(q.formula)}</small>`:''}`;
+  }catch(e){
+    console.error('Erro no teste de distância',e);
+    box.textContent='Não foi possível calcular a distância para este CEP.';
+  }
+}
+async function clearDistanceCache(){
+  if(!confirm('Limpar o cache de distâncias? Novas cotações serão recalculadas.'))return;
+  const password=sessionStorage.getItem('rtd_admin_pass');
+  const msg=$('#distanceFormulaMsg');
+  try{
+    await shippingAdminApi({action:'admin_clear_distance_cache',password});
+    if(msg){msg.className='authmsg ok';msg.textContent='Cache de distâncias limpo.'}
+  }catch(e){
+    console.error('Erro ao limpar cache',e);
+    if(msg){msg.className='authmsg bad';msg.textContent='Não foi possível limpar o cache.'}
+  }
+}
+
 $('#cartBtn').onclick=async()=>{$('#cartModal').classList.add('open');renderCart();await autofillCheckoutProfile();await quoteShipping();checkMercadoPago()};
 $('#closeCart').onclick=()=>$('#cartModal').classList.remove('open');
 $('#calcShippingBtn').onclick=quoteShipping;
@@ -1315,7 +1353,10 @@ $('#cartModal').addEventListener('click',e=>{if(e.target===$('#cartModal'))$('#c
 $('#cartWhatsAppBtn').onclick=cartWhatsApp;
 $('#mpCheckoutBtn').onclick=startMercadoPagoCheckout;
 $('#refreshShippingAdmin').onclick=loadShippingAdmin;$('#saveShippingSettings').onclick=saveShippingSettings;$('#saveShippingRule').onclick=saveShippingRule;$('#clearShippingRule').onclick=clearShippingRule;
-$('#saveDistanceFormula').onclick=saveDistanceFormula;$('#testDistanceFormula').onclick=testDistanceFormula;$('#clearDistanceCache').onclick=clearDistanceCache;['shipBaseCost','shipBaseKm','shipFixedFee','shipMinValue','shipMultiplier'].forEach(id=>$('#'+id).addEventListener('input',updateDistanceFormulaPreview));
+if($('#saveDistanceFormula'))$('#saveDistanceFormula').onclick=saveDistanceFormula;
+if($('#testDistanceFormula'))$('#testDistanceFormula').onclick=testDistanceFormula;
+if($('#clearDistanceCache'))$('#clearDistanceCache').onclick=clearDistanceCache;
+['shipBaseCost','shipBaseKm','shipFixedFee','shipMinValue','shipMultiplier'].forEach(id=>{const el=$('#'+id);if(el)el.addEventListener('input',updateDistanceFormulaPreview)});
 
 $('#newConsumable').onclick=clearConsumableForm;$('#refreshConsumables').onclick=loadAdminConsumables;$('#saveConsumableAdmin').onclick=saveConsumableAdmin;$('#cancelConsumableEdit').onclick=clearConsumableForm;$('#deleteConsumableAdmin').onclick=()=>deleteConsumable($('#conCode').value);['conCode','conName','conCategory','conImage','conStock','conPrice','conActive'].forEach(id=>$('#'+id)?.addEventListener('input',updateConsumablePreview));$('#conActive')?.addEventListener('change',updateConsumablePreview);
 window.exportCustomer=id=>{const c=adminCustomersCache.find(x=>x.id===id);if(!c)return alert('Cliente não encontrado.');const rows=fullExportRows(id);csvDownload(`RTD_cliente_${String(c.nome_completo||'cliente').replace(/[^a-z0-9]+/gi,'_')}_historico.csv`,FULL_HEADERS,rows)};
