@@ -177,6 +177,8 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 
 .order-history-list{display:grid;gap:12px;margin-top:14px}.order-history-card{border:1px solid #dce3e6;border-radius:15px;padding:15px;background:#fff}.order-history-card .oh-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.order-history-card .oh-type{font-size:11px;font-weight:900;letter-spacing:.08em;color:#ff6b00;text-transform:uppercase}.order-history-card .oh-title{font-size:17px;font-weight:900;margin-top:3px}.order-history-card .oh-meta{font-size:12px;color:#68767d;line-height:1.55;margin-top:7px}.order-history-card .oh-status{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.paypill{display:inline-block;padding:6px 9px;border-radius:999px;background:#eef7f1;color:#17653d;font-size:11px;font-weight:900}.paypill.pending{background:#fff5e9;color:#935000}.order-history-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.admin-order-history{margin-top:18px}.admin-order-history .order-history-card{background:#fafcfc}
 
+
+.pix-pay-wrap{text-align:center}.pix-qr{width:240px;max-width:78vw;background:#fff;border:1px solid #dce3e6;border-radius:16px;padding:10px;margin:14px auto}.pix-code{width:100%;min-height:82px;border:1px solid #dce3e6;border-radius:12px;padding:10px;font-size:11px;resize:none;background:#f8fafb}.pix-value{font-size:26px;font-weight:900;margin:8px 0}.pix-state{padding:12px;border-radius:12px;background:#fff6ec;margin-top:12px}.pix-state.ok{background:#eef8f3;color:#17653d}.pix-count{font-size:12px;color:#68767d;margin-top:6px}
 </style>
 </head>
 <body>
@@ -230,7 +232,7 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div class="rule"><h3>3. Devolva no horário combinado</h3><p>Atrasos podem gerar cobrança adicional conforme as condições da locação.</p></div>
 </div></div></section>
 
-<footer><div class="foot"><div style="display:flex;gap:12px;align-items:center"><img src="data:image/webp;base64,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" alt="RTD Soluções"><div><b style="color:white">RTD SOLUÇÕES</b><br><small>Locação de ferramentas por hora.</small></div></div><div><b style="color:white">Horário operacional</b><br><small>09:00 às 18:00</small></div><div><b style="color:white">WhatsApp</b><br><small>(16) 99114-6663</small></div><div style="text-align:right"><button class="adminbtn" id="openAdmin">Gestão</button></div></div><div style="max-width:1240px;margin:12px auto 0;font-size:10px;color:#657178">Versão 1.8.0 RC16 • Pedidos unificados + impressão dinâmica + status de pagamento</div></footer>
+<footer><div class="foot"><div style="display:flex;gap:12px;align-items:center"><img src="data:image/webp;base64,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" alt="RTD Soluções"><div><b style="color:white">RTD SOLUÇÕES</b><br><small>Locação de ferramentas por hora.</small></div></div><div><b style="color:white">Horário operacional</b><br><small>09:00 às 18:00</small></div><div><b style="color:white">WhatsApp</b><br><small>(16) 99114-6663</small></div><div style="text-align:right"><button class="adminbtn" id="openAdmin">Gestão</button></div></div><div style="max-width:1240px;margin:12px auto 0;font-size:10px;color:#657178">Versão 1.8.0 RC17 • Pedidos unificados + impressão dinâmica + status de pagamento</div></footer>
 
 <div class="modal" id="modal"><div class="modal-card"><div class="mhead"><div><div class="eyebrow">RESERVA</div><h2 id="modalName"></h2><div class="sub" id="modalCode"></div></div><button class="close" id="closeModal">×</button></div>
 <div class="formgrid">
@@ -238,7 +240,7 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div class="field"><label>Data</label><input id="date" type="date"></div>
 <div class="field"><label>Horário de retirada</label><select id="time"></select></div>
 <div class="field full"><div class="authmsg ok" id="approvedCustomer">Cliente verificado</div></div>
-<div class="field"><label>Forma de pagamento desejada</label><select id="payment"><option>PIX</option><option>Dinheiro</option><option>Cartão de débito</option><option value="Cartão de crédito">Cartão de crédito online</option></select></div>
+<div class="field"><label>Forma de pagamento desejada</label><select id="payment"><option value="PIX online">PIX online</option><option value="Cartão de crédito online">Cartão de crédito online</option><option value="PIX na retirada">PIX na retirada</option><option value="Cartão de crédito na retirada">Cartão de crédito na retirada</option><option value="Cartão de débito na retirada">Cartão de débito na retirada</option><option value="Dinheiro na retirada">Dinheiro na retirada</option></select></div>
 <div class="field full"><label>O que você pretende fazer?</label><input id="service" placeholder="Ex.: instalar uma prateleira"></div><div class="field full"><div class="consumables-box"><h4>Consumíveis compatíveis (opcionais)</h4><div class="sub">Consumíveis não acompanham a locação. Se o item estiver sem estoque, você pode registrar interesse e será avisado caso seja abastecido antes da retirada.</div><div id="reservationConsumables" class="consumables-list"><div class="loading">Carregando consumíveis...</div></div></div></div>
 </div>
 <div id="availability" class="avail">Escolha data e horário. A lista mostra somente horários realmente livres para este equipamento.</div>
@@ -285,12 +287,13 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
   </div>
   <div class="mp-status pending" id="mpStatus">Verificando disponibilidade do Mercado Pago...</div>
   <div class="checkout-actions">
-    <button class="mpbtn" id="mpCheckoutBtn" disabled>Pagar com Mercado Pago</button>
+    <button class="mpbtn" id="pixCheckoutBtn" disabled>Pagar com PIX online</button><button class="mpbtn" id="mpCheckoutBtn" disabled>Pagar com cartão online</button>
     <button class="wa-suggest-btn" id="cartWhatsAppBtn" style="border:0;cursor:pointer">Finalizar pelo WhatsApp</button>
   </div>
   <div class="authmsg" id="checkoutMsg"></div>
 </div></div>
 
+<div class="modal" id="pixModal"><div class="modal-card" style="max-width:560px"><div class="mhead"><div><div class="eyebrow">PAGAMENTO PIX</div><h2 id="pixModalTitle">Aguardando pagamento</h2><p class="sub" id="pixModalSub">Escaneie o QR Code ou use o PIX Copia e Cola.</p></div><button class="close" id="closePixModal">×</button></div><div id="pixModalBody"><div class="loading">Gerando PIX...</div></div><div class="reservation-done-actions" style="margin-top:14px"><button class="smallbtn" id="pixCopyBtn" style="display:none">Copiar PIX</button><button class="smallbtn" id="pixOrderBtn" style="display:none">Ver / imprimir pedido</button><button class="confirm" id="pixDoneBtn" style="display:none">Concluir</button></div></div></div>
 <div class="modal" id="customerModal"><div class="modal-card"><div class="mhead"><div><div class="eyebrow">RTD CLIENTE VERIFICADO</div><h2>Cadastro e acesso</h2><p class="sub">Somente clientes aprovados podem concluir reservas.</p></div><button class="close" id="closeCustomer">×</button></div>
 <div id="authPane">
 <div class="formgrid"><div class="field full"><label>E-mail</label><input id="authEmail" type="email" autocomplete="email"></div><div class="field full"><label>Senha</label><input id="authPassword" type="password" minlength="8" autocomplete="current-password" aria-describedby="passwordRule"><small id="passwordRule" class="sub" style="display:block;margin-top:6px">Para criar um acesso, use no mínimo 8 caracteres e pelo menos 1 caractere especial, como ! @ # $ % &amp; * ?.</small></div></div>
@@ -480,6 +483,8 @@ const STOREFRONT_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-
 const PAYMENT_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-payment-api';
 const RENTAL_PAYMENT_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-rental-payment-api';
 const ORDER_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-order-api';
+const RESERVATION_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-reservation-api';
+const PIX_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-pix-api';
 const SHIPPING_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-shipping-api';
 const ADMIN_CUSTOMER_CREATE_API='https://tgbxpvfbcmemmyzhjpeq.supabase.co/functions/v1/rtd-admin-customer-create';
 const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYnhwdmZiY21lbW15emhqcGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2Mjk2OTIsImV4cCI6MjEwNDIwNTY5Mn0.mI2_E7s68fUReQHavbTArX6QmdxXaGBtSkzTed3yeKo';
@@ -577,7 +582,7 @@ function renderCart(){
   if($('#cartSubtotal'))$('#cartSubtotal').textContent=brl(cartSubtotal());
   if($('#cartFreight'))$('#cartFreight').textContent=brl(selectedShipping?.valor||0);
   if($('#cartTotal'))$('#cartTotal').textContent=brl(grandTotal());
-  $('#mpCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel;
+  $('#mpCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel;if($('#pixCheckoutBtn'))$('#pixCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel;if($('#pixCheckoutBtn'))$('#pixCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel;
 }
 function renderStore(items=[]){
   const box=$('#storeGrid');if(!box)return;storefrontConsumables=items;
@@ -691,6 +696,19 @@ async function loadStore(need=''){
   try{const d=await storefrontApi({action:need?'by_need':'catalog',need});renderStore(d.consumiveis||[]);if(need)renderNeedConsumables(d.consumiveis||[],need);else renderNeedConsumables([],need)}
   catch(e){console.warn('Vitrine de consumíveis indisponível.',e);if(box)box.innerHTML='<div class="loading">Não foi possível carregar os consumíveis agora. Fale com a RTD pelo WhatsApp.</div>';if(need)renderNeedConsumables([],need)}
 }
+async function startPixConsumablesCheckout(){
+  if(!cart.length||!mpConfigured||!selectedShipping?.disponivel)return;
+  const nome=$('#checkoutName').value.trim(),email=$('#checkoutEmail').value.trim(),whatsapp=$('#checkoutPhone').value.trim();
+  $('#checkoutMsg').className='authmsg';$('#checkoutMsg').textContent='Gerando cobrança PIX...';$('#pixCheckoutBtn').disabled=true;
+  try{
+    if(!nome||!email.includes('@')||String(whatsapp).replace(/\D/g,'').length<10)throw Object.assign(new Error('DADOS_INVALIDOS'),{code:'DADOS_INVALIDOS'});
+    const delivery={...selectedShipping,...checkoutAddressPayload()};
+    const p=await pixApi({action:'create_consumables_pix',cliente_nome:nome,cliente_email:email,cliente_whatsapp:whatsapp,itens:cart.map(x=>({codigo:x.codigo,quantidade:x.quantidade})),delivery});
+    $('#checkoutMsg').className='authmsg good';$('#checkoutMsg').textContent='PIX gerado. Conclua o pagamento pelo QR Code.';
+    pixDisplay(p,{tipo:'consumiveis',id:p.pedido_id,orderRef:{tipo:'consumiveis',id:p.pedido_id}});
+  }catch(e){console.error(e);$('#checkoutMsg').className='authmsg bad';const msgs={DADOS_INVALIDOS:'Confira seus dados de contato.',ENDERECO_INCOMPLETO:'Complete o endereço de entrega.',CEP_INVALIDO:'Informe um CEP válido.',FRETE_INDISPONIVEL:'A opção de frete selecionada não está disponível.',ESTOQUE_INSUFICIENTE:'Um item ficou sem estoque.',MERCADOPAGO_ERRO:'Não foi possível gerar o PIX no Mercado Pago. Confira se há uma chave PIX ativa na conta.'};$('#checkoutMsg').textContent=msgs[e.code]||'Não foi possível gerar o PIX agora.'
+  }finally{$('#pixCheckoutBtn').disabled=!mpConfigured||!cart.length||!selectedShipping?.disponivel}
+}
 async function checkMercadoPago(){
   try{const r=await fetch(PAYMENT_API+'?status=config');const d=await r.json();mpConfigured=!!d.configured;$('#mpStatus').className='mp-status '+(mpConfigured?'ready':'pending');$('#mpStatus').textContent=mpConfigured?'Mercado Pago disponível para pagamento online.':'Mercado Pago: integração preparada; credenciais de produção ainda precisam ser configuradas.'}
   catch{mpConfigured=false;$('#mpStatus').className='mp-status pending';$('#mpStatus').textContent='Mercado Pago temporariamente indisponível.'}
@@ -742,6 +760,28 @@ const orderApi=async(payload={},adminMode=false)=>{
   if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});
   return data;
 };
+const reservationApi=async(payload={})=>{
+  const s=await refreshSession();if(!s?.access_token)throw Object.assign(new Error('LOGIN_NECESSARIO'),{code:'LOGIN_NECESSARIO'});
+  const r=await fetch(RESERVATION_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+s.access_token},body:JSON.stringify(payload)});
+  const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;
+};
+const pixApi=async(payload={},authOptional=true)=>{
+  const headers={'Content-Type':'application/json','apikey':ANON};
+  const s=await refreshSession().catch(()=>null);if(s?.access_token)headers.Authorization='Bearer '+s.access_token;
+  const r=await fetch(PIX_API,{method:'POST',headers,body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data;
+};
+let pixPollTimer=null,pixCurrent=null;
+function stopPixPolling(){if(pixPollTimer){clearInterval(pixPollTimer);pixPollTimer=null}}
+function pixDisplay(data,{tipo,id,orderRef=null}={}){
+  stopPixPolling();pixCurrent={data,tipo,id,orderRef};
+  const qr=data.qr_code_base64?`<img class="pix-qr" src="data:image/png;base64,${data.qr_code_base64}" alt="QR Code PIX">`:'';
+  $('#pixModalTitle').textContent='Aguardando pagamento PIX';
+  $('#pixModalSub').textContent='O pagamento será confirmado automaticamente assim que o Mercado Pago informar a aprovação.';
+  $('#pixModalBody').innerHTML=`<div class="pix-pay-wrap"><div class="pix-value">${brl(data.valor_total||0)}</div>${qr}<div class="field" style="text-align:left"><label>PIX Copia e Cola</label><textarea class="pix-code" id="pixCodeText" readonly>${esc(data.qr_code||'')}</textarea></div><div class="pix-state" id="pixLiveState"><b>Aguardando pagamento</b><div class="pix-count">A cobrança expira automaticamente conforme o prazo do pedido.</div></div></div>`;
+  $('#pixCopyBtn').style.display=data.qr_code?'':'none';$('#pixOrderBtn').style.display=orderRef?'':'none';$('#pixDoneBtn').style.display='none';
+  $('#pixModal').classList.add('open');
+  if(tipo&&id){pixPollTimer=setInterval(async()=>{try{const s=await pixApi({action:'status',tipo,id});if(/Pago/i.test(String(s.status_pagamento||''))||s.status_pedido==='Pago'||s.status_pedido==='Confirmada'&&tipo==='locacao'&&s.mp_status==='approved'){stopPixPolling();$('#pixModalTitle').textContent='Pagamento concluído';$('#pixModalSub').textContent='Pagamento aprovado pelo Mercado Pago.';$('#pixLiveState').className='pix-state ok';$('#pixLiveState').innerHTML=`<b>✓ Pagamento confirmado</b><div class="pix-count">${tipo==='locacao'?'Reserva confirmada e consumíveis processados automaticamente.':'Pedido pago e estoque processado automaticamente.'}</div>`;$('#pixDoneBtn').style.display='';if(tipo==='consumiveis'){cart=[];updateCartBadge();renderCart();loadStorefront().catch(()=>{})}}else if(/Expirado|Cancelado|recusado/i.test(String(s.status_pagamento||s.status_pedido||''))){stopPixPolling();$('#pixModalTitle').textContent='Pagamento não concluído';$('#pixLiveState').innerHTML='<b>Cobrança expirada ou cancelada.</b>'}}catch(e){console.warn('poll pix',e)}},3000)}
+}
 const customerProfileApi=async(payload={})=>{const s=await refreshSession();if(!s?.access_token)throw Object.assign(new Error('LOGIN_NECESSARIO'),{code:'LOGIN_NECESSARIO'});const r=await fetch(CUSTOMER_PROFILE_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+s.access_token},body:JSON.stringify(payload)});const data=await r.json().catch(()=>({error:'RESPOSTA_INVALIDA'}));if(!r.ok)throw Object.assign(new Error(data.error||'ERRO'),{code:data.error,status:r.status,data});return data};
 function isoLocalDate(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
 function toISO(date,time){return new Date(`${date}T${time}:00-03:00`).toISOString()}
@@ -837,7 +877,7 @@ async function loadReservationConsumables(){
     if(box)box.innerHTML='<div class="finance-note">Não foi possível consultar consumíveis agora. A reserva da ferramenta continua disponível normalmente.</div>';
   }
 }
-function openModal(code,h=1){selected=tools.find(t=>t.codigo===code);if(!selected)return;$('#modalName').textContent=selected.nome;$('#modalCode').textContent=selected.codigo;$('#period').value=String(h);$('#service').value='';$('#approvedCustomer').textContent=customer?`Cliente aprovado: ${customer.nome_completo}`:'Cliente verificado';$('#payment').value='PIX';$('#terms').checked=false;$('#success').classList.remove('show');const now=new Date();$('#date').min=isoLocalDate(now);$('#date').value=isoLocalDate(now);$('#time').innerHTML='';$('#modal').classList.add('open');loadReservationConsumables();updateUI()}
+function openModal(code,h=1){selected=tools.find(t=>t.codigo===code);if(!selected)return;$('#modalName').textContent=selected.nome;$('#modalCode').textContent=selected.codigo;$('#period').value=String(h);$('#service').value='';$('#approvedCustomer').textContent=customer?`Cliente aprovado: ${customer.nome_completo}`:'Cliente verificado';$('#payment').value='PIX online';$('#terms').checked=false;$('#success').classList.remove('show');const now=new Date();$('#date').min=isoLocalDate(now);$('#date').value=isoLocalDate(now);$('#time').innerHTML='';$('#modal').classList.add('open');loadReservationConsumables();updateUI()}
 let avTimer;
 
 let lastReservationOrder=null,lastReservationPaymentUrl='',lastOrderRef=null;
@@ -895,9 +935,9 @@ async function ensureSelectedConsumablesInReservation(reservaId){
   }
   return included;
 }
-async function updateUI(){if(!selected)return;const h=$('#period').value;const box=$('#availability');box.textContent='Atualizando dias e horários disponíveis...';box.classList.remove('bad');let opts;try{opts=await syncBookingOptions()}catch(e){box.textContent='Não foi possível carregar os horários disponíveis agora.';box.classList.add('bad');refreshConfirm(false);return}if(!$('#date').value||!$('#time').value){box.textContent='Não há horários livres para este equipamento nesta data. Reservas canceladas são liberadas automaticamente; tente atualizar ou escolher outra data.';box.classList.add('bad');refreshConfirm(false);return}const startISO=toISO($('#date').value,$('#time').value);const ret=addHours(startISO,h);$('#rentValue').textContent=brl(price(selected,h));$('#depValue').textContent=brl(selected.caucao);$('#paymentPreview').textContent=$('#payment').value==='Cartão de crédito'?'Cartão de crédito online':$('#payment').value;
+async function updateUI(){if(!selected)return;const h=$('#period').value;const box=$('#availability');box.textContent='Atualizando dias e horários disponíveis...';box.classList.remove('bad');let opts;try{opts=await syncBookingOptions()}catch(e){box.textContent='Não foi possível carregar os horários disponíveis agora.';box.classList.add('bad');refreshConfirm(false);return}if(!$('#date').value||!$('#time').value){box.textContent='Não há horários livres para este equipamento nesta data. Reservas canceladas são liberadas automaticamente; tente atualizar ou escolher outra data.';box.classList.add('bad');refreshConfirm(false);return}const startISO=toISO($('#date').value,$('#time').value);const ret=addHours(startISO,h);$('#rentValue').textContent=brl(price(selected,h));$('#depValue').textContent=brl(selected.caucao);$('#paymentPreview').textContent=$('#payment').value;
 $('#consumablesValue').textContent=brl(selectedConsumablesTotal());
-const onlineCard=$('#payment').value==='Cartão de crédito';
+const onlineCard=['Cartão de crédito online','PIX online'].includes($('#payment').value);
 $('#totalValue').textContent=brl(price(selected,h)+selectedConsumablesTotal()+Number(selected.caucao));
 const totalLabel=$('#totalValue')?.previousElementSibling;if(totalLabel)totalLabel.textContent=onlineCard?'Total da cobrança online':'Total previsto na retirada';$('#returnValue').textContent=fmtDT(ret.toISOString());box.textContent='Verificando disponibilidade...';clearTimeout(avTimer);avTimer=setTimeout(async()=>{try{const d=await api({action:'availability',equipamento_codigo:selected.codigo,retirada:startISO,horas:Number(h)});if(d.available){let suffix='';if(opts?.adjusted){if(opts.reason==='FERIADO')suffix=' Data ajustada para o próximo dia útil por feriado.';else if(opts.reason==='FIM_DE_SEMANA')suffix=' Data ajustada para o próximo dia útil por fim de semana.';else if(opts.reason==='SEM_HORARIOS_HOJE')suffix=' Não havia mais horário compatível hoje; foi selecionado o próximo dia útil.'}box.textContent='✓ Horário disponível para reserva.'+suffix;box.classList.remove('bad')}else{box.textContent='Este horário não está disponível. Escolha outra opção.';box.classList.add('bad')}refreshConfirm(d.available)}catch(e){box.textContent='Não foi possível verificar este horário agora.';box.classList.add('bad');refreshConfirm(false)}},220)}
 function refreshConfirm(av=true){$('#confirm').disabled=!(av&&customer?.status==='Aprovado'&&$('#terms').checked)}
@@ -912,9 +952,7 @@ $('#confirm').onclick=async()=>{
       $('#availability').textContent='Seu score interno está abaixo de 20 pontos. Novas reservas ficam temporariamente bloqueadas até a recuperação da pontuação.';
       $('#confirm').disabled=false;return;
     }
-    const d=await api({action:'reserve',equipamento_codigo:selected.codigo,forma_pagamento:pay,servico:$('#service').value.trim(),retirada:startISO,horas:h,consumiveis:selectedConsumablesPayload()},true);
-    const selectedAvailableCount=selectedConsumablesPayload().filter(x=>x.incluir).length;
-    if(selectedAvailableCount)await ensureSelectedConsumablesInReservation(d.reserva_id);
+    const d=await reservationApi({action:'reserve',equipamento_codigo:selected.codigo,forma_pagamento:pay,servico:$('#service').value.trim(),retirada:startISO,horas:h,consumiveis:selectedConsumablesPayload()});
     const wa='https://wa.me/'+COMPANY_WA+'?text='+encodeURIComponent('Olá, fiz a solicitação de reserva '+d.codigo_reserva+' pelo site da RTD Soluções.');
     lastOrderRef={tipo:'locacao',id:d.reserva_id};
     $('#reservationDoneWhatsApp').href=wa;
@@ -924,7 +962,7 @@ $('#confirm').onclick=async()=>{
     $('#reservationPrintOrder').style.display='';
     lastReservationOrder=null;lastReservationPaymentUrl='';
 
-    if(pay==='Cartão de crédito'){
+    if(pay==='Cartão de crédito online'){
       $('#reservationDoneTitle').textContent='Pedido criado — pagamento pendente';
       $('#reservationDoneSub').textContent='Confira os itens abaixo e conclua o pagamento online para confirmar a reserva.';
       try{
@@ -947,9 +985,20 @@ $('#confirm').onclick=async()=>{
           try{const retry=await rentalPaymentApi({action:'create_checkout',reserva_id:d.reserva_id});if(retry.init_point)location.href=retry.init_point;else throw new Error('SEM_LINK')}catch(err){console.error(err);alert('Ainda não foi possível abrir o Mercado Pago. O pedido continua salvo no Histórico.')}finally{$('#reservationPayOnline').disabled=false}
         };
       }
+    }else if(pay==='PIX online'){
+      $('#reservationDoneTitle').textContent='Pedido criado — aguardando PIX';
+      $('#reservationDoneSub').textContent='O pedido foi reservado por até 20 minutos enquanto você conclui o PIX.';
+      try{
+        const p=await pixApi({action:'create_rental_pix',reserva_id:d.reserva_id});
+        lastReservationOrder={codigo_reserva:d.codigo_reserva,equipamento:{nome:selected.nome},retirada:startISO,devolucao_prevista:d.devolucao_prevista,horas_contratadas:h,locacao:d.valor_locacao,valor_consumiveis:p.valor_consumiveis,caucao:d.caucao,total:p.valor_total,consumiveis:p.itens||[]};
+        $('#reservationDoneDetails').innerHTML=reservationDoneSummaryHtml(lastReservationOrder)+`<div class="statusbox" style="margin-top:12px;background:#fff7ed"><b>PIX online</b><p class="sub" style="margin:7px 0 0">Abra o QR Code para efetuar o pagamento. A confirmação da reserva e a baixa dos consumíveis ocorrerão automaticamente.</p></div>`;
+        $('#reservationPayOnline').textContent='Abrir QR Code PIX';$('#reservationPayOnline').style.display='';$('#reservationPayOnline').onclick=()=>pixDisplay(p,{tipo:'locacao',id:d.reserva_id,orderRef:{tipo:'locacao',id:d.reserva_id}});
+        $('#reservationPrintOrder').style.display='';
+        pixDisplay(p,{tipo:'locacao',id:d.reserva_id,orderRef:{tipo:'locacao',id:d.reserva_id}});
+      }catch(pe){console.error(pe);$('#reservationDoneDetails').innerHTML=`<div class="row"><span>Código</span><strong>${esc(d.codigo_reserva)}</strong></div><div class="statusbox" style="margin-top:12px"><b>Não foi possível gerar o PIX</b><p class="sub" style="margin:7px 0 0">O pedido foi preservado em Aguardando pagamento. Tente novamente pelo Histórico ou fale com a RTD.</p></div>`;}
     }else{
       $('#reservationDoneTitle').textContent='Solicitação de reserva concluída';
-      $('#reservationDoneSub').textContent='Sua solicitação foi registrada com sucesso e ficará disponível para acompanhamento.';
+      $('#reservationDoneSub').textContent='Reserva registrada. O pagamento será realizado presencialmente na retirada, conforme a forma escolhida.';
       try{const od=await orderApi({action:'my_order_detail',tipo:'locacao',id:d.reserva_id});lastReservationOrder=od.pedido;const o=od.pedido;$('#reservationDoneDetails').innerHTML=`<div class="row"><span>Código</span><strong>${esc(o.codigo)}</strong></div><div class="row"><span>Status</span><strong>${esc(o.status_pedido)}</strong></div><div class="row"><span>Pagamento</span><strong>${esc(o.status_pagamento)}</strong></div><div class="row"><span>Equipamento</span><strong>${esc(o.equipamento?.nome||selected.nome)}</strong></div><div class="row"><span>Retirada</span><strong>${fmtDT(o.retirada)}</strong></div><div class="row"><span>Devolução prevista</span><strong>${fmtDT(o.devolucao_prevista)}</strong></div><div class="row"><span>Total previsto</span><strong>${brl(o.valores?.locacao+o.valores?.consumiveis+o.valores?.caucao+o.valores?.multa)}</strong></div><p class="sub" style="margin:12px 0 0">O pedido já está disponível no seu Histórico e pode ser impresso a qualquer momento.</p>`}catch{const consumiveisResumo=(d.consumiveis||[]).length?'<div class="statusbox" style="margin-top:12px"><b>Consumíveis</b><br>'+d.consumiveis.map(c=>esc(c.nome)+' — '+esc(c.status)).join('<br>')+'</div>':'';$('#reservationDoneDetails').innerHTML=`<div class="row"><span>Código</span><strong>${esc(d.codigo_reserva)}</strong></div><div class="row"><span>Equipamento</span><strong>${esc(selected.nome)}</strong></div><div class="row"><span>Retirada</span><strong>${fmtDT(startISO)}</strong></div><div class="row"><span>Devolução prevista</span><strong>${fmtDT(d.devolucao_prevista)}</strong></div>${consumiveisResumo}`}
     }
     $('#modal').classList.remove('open');
@@ -1572,6 +1621,12 @@ $('#checkoutCep').addEventListener('blur',async()=>{const cep=$('#checkoutCep').
 $('#cartModal').addEventListener('click',e=>{if(e.target===$('#cartModal'))$('#cartModal').classList.remove('open')});
 $('#cartWhatsAppBtn').onclick=cartWhatsApp;
 $('#mpCheckoutBtn').onclick=startMercadoPagoCheckout;
+$('#pixCheckoutBtn').onclick=startPixConsumablesCheckout;
+$('#closePixModal').onclick=()=>{$('#pixModal').classList.remove('open');stopPixPolling()};
+$('#pixDoneBtn').onclick=()=>{$('#pixModal').classList.remove('open');stopPixPolling()};
+$('#pixCopyBtn').onclick=async()=>{const t=$('#pixCodeText')?.value||'';if(!t)return;try{await navigator.clipboard.writeText(t);$('#pixCopyBtn').textContent='PIX copiado ✓';setTimeout(()=>$('#pixCopyBtn').textContent='Copiar PIX',1800)}catch{alert('Selecione o código PIX e copie manualmente.')}};
+$('#pixOrderBtn').onclick=()=>{if(pixCurrent?.orderRef)openOrderDocument(pixCurrent.orderRef.tipo,pixCurrent.orderRef.id,false)};
+
 $('#refreshShippingAdmin').onclick=loadShippingAdmin;$('#saveShippingSettings').onclick=saveShippingSettings;$('#saveShippingRule').onclick=saveShippingRule;$('#clearShippingRule').onclick=clearShippingRule;
 if($('#saveDistanceFormula'))$('#saveDistanceFormula').onclick=saveDistanceFormula;
 if($('#testDistanceFormula'))$('#testDistanceFormula').onclick=testDistanceFormula;
