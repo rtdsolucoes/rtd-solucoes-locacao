@@ -262,7 +262,7 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
     <div class="field full"><label>Nome</label><input id="checkoutName" placeholder="Nome completo"></div>
     <div class="field"><label>E-mail</label><input id="checkoutEmail" type="email" placeholder="voce@email.com"></div>
     <div class="field"><label>WhatsApp</label><input id="checkoutPhone" placeholder="(16) 99999-9999"></div>
-    <div class="field"><label>CEP</label><input id="checkoutCep" inputmode="numeric" maxlength="9" placeholder="00000-000"></div>
+    <div class="field"><label>CEP</label><input id="checkoutCep" inputmode="numeric" maxlength="9" placeholder="00000-000"><small id="checkoutCepHint" style="display:block;margin-top:5px;color:#68767d">Ao informar o CEP, o endereço será preenchido automaticamente.</small></div>
     <div class="field"><label>UF</label><input id="checkoutUf" maxlength="2"></div>
     <div class="field full"><label>Endereço</label><input id="checkoutAddress"></div>
     <div class="field"><label>Número</label><input id="checkoutNumber"></div>
@@ -586,6 +586,7 @@ function fillCheckout(c){
   currentCheckoutProfile=c;
   const vals={checkoutName:c.nome_completo||'',checkoutEmail:c.email||'',checkoutPhone:c.whatsapp||'',checkoutCep:c.cep||'',checkoutAddress:c.endereco||'',checkoutNumber:c.numero||'',checkoutComplement:c.complemento||'',checkoutDistrict:c.bairro||'',checkoutCity:c.cidade||'',checkoutUf:c.uf||''};
   Object.entries(vals).forEach(([id,v])=>{if($('#'+id))$('#'+id).value=v});
+  lastCheckoutCepLookup=String(c.cep||'').replace(/\D/g,'');
   $('#checkoutProfileNote')?.classList.add('show');
 }
 async function autofillCheckoutProfile(){
@@ -594,6 +595,69 @@ async function autofillCheckoutProfile(){
   try{const d=await customerProfileApi();if(d?.cliente){fillCheckout(d.cliente);return d.cliente}}catch(e){console.warn('Perfil não carregado no carrinho',e)}
   return null;
 }
+
+let lastCheckoutCepLookup='';
+let checkoutCepLookupTimer=null;
+
+function formatCepValue(v){
+  const d=String(v||'').replace(/\D/g,'').slice(0,8);
+  return d.length>5?d.slice(0,5)+'-'+d.slice(5):d;
+}
+
+async function lookupCheckoutCep({force=false}={}){
+  const cep=String($('#checkoutCep')?.value||'').replace(/\D/g,'');
+  const hint=$('#checkoutCepHint');
+  if(cep.length!==8){
+    if(hint)hint.textContent='Informe os 8 dígitos do CEP.';
+    return false;
+  }
+  if(!force && cep===lastCheckoutCepLookup)return true;
+  if(hint)hint.textContent='Buscando endereço...';
+  try{
+    const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`,{headers:{Accept:'application/json'}});
+    const d=await r.json().catch(()=>null);
+    if(!r.ok||!d||d.erro)throw new Error('CEP_NAO_ENCONTRADO');
+
+    // O CEP define estes campos; número e complemento continuam sob controle do cliente.
+    $('#checkoutAddress').value=d.logradouro||'';
+    $('#checkoutDistrict').value=d.bairro||'';
+    $('#checkoutCity').value=d.localidade||'';
+    $('#checkoutUf').value=(d.uf||'').toUpperCase();
+
+    // Número não deve ser herdado de um endereço anterior quando o CEP muda.
+    if(cep!==lastCheckoutCepLookup){
+      $('#checkoutNumber').value='';
+      $('#checkoutComplement').value='';
+    }
+
+    lastCheckoutCepLookup=cep;
+    selectedShipping={metodo:'retirada',codigo:'retirada',servico:'Retirada pessoalmente',valor:0,prazo_dias:0,disponivel:true};
+    renderCart();
+
+    if(hint)hint.textContent='Endereço localizado. Preencha o número da residência e, se necessário, o complemento.';
+    $('#checkoutNumber')?.focus();
+    return true;
+  }catch(e){
+    console.warn('Falha ao consultar CEP',e);
+    if(hint)hint.textContent='CEP não localizado automaticamente. Confira o número ou preencha o endereço manualmente.';
+    return false;
+  }
+}
+
+function scheduleCheckoutCepLookup(){
+  clearTimeout(checkoutCepLookupTimer);
+  const el=$('#checkoutCep');
+  if(!el)return;
+  el.value=formatCepValue(el.value);
+  const cep=el.value.replace(/\D/g,'');
+  if(cep.length===8){
+    checkoutCepLookupTimer=setTimeout(async()=>{
+      const ok=await lookupCheckoutCep();
+      if(ok)await quoteShipping();
+    },250);
+  }
+}
+
 function checkoutAddressPayload(){return {cep:$('#checkoutCep').value,endereco:$('#checkoutAddress').value,numero:$('#checkoutNumber').value,complemento:$('#checkoutComplement').value,bairro:$('#checkoutDistrict').value,cidade:$('#checkoutCity').value,uf:$('#checkoutUf').value}}
 function renderDeliveryOptions(options=[]){
   const box=$('#deliveryOptions');if(!box)return;
@@ -1348,7 +1412,9 @@ async function clearDistanceCache(){
 $('#cartBtn').onclick=async()=>{$('#cartModal').classList.add('open');renderCart();await autofillCheckoutProfile();await quoteShipping();checkMercadoPago()};
 $('#closeCart').onclick=()=>$('#cartModal').classList.remove('open');
 $('#calcShippingBtn').onclick=quoteShipping;
-$('#checkoutCep').addEventListener('change',quoteShipping);
+$('#checkoutCep').addEventListener('input',scheduleCheckoutCepLookup);
+$('#checkoutCep').addEventListener('blur',async()=>{const cep=$('#checkoutCep').value.replace(/\D/g,'');if(cep.length===8){const ok=await lookupCheckoutCep();if(ok)await quoteShipping()}});
+
 $('#cartModal').addEventListener('click',e=>{if(e.target===$('#cartModal'))$('#cartModal').classList.remove('open')});
 $('#cartWhatsAppBtn').onclick=cartWhatsApp;
 $('#mpCheckoutBtn').onclick=startMercadoPagoCheckout;
