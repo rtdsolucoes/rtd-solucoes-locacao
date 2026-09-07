@@ -1,4 +1,33 @@
-<!doctype html>
+<
+function updateDistanceFormulaPreview(){
+  const base=Math.max(0,Number($('#shipBaseCost')?.value||0)),km=Math.max(.01,Number($('#shipBaseKm')?.value||8)),fixed=Math.max(0,Number($('#shipFixedFee')?.value||0)),min=Math.max(0,Number($('#shipMinValue')?.value||0)),mult=Math.max(0,Number($('#shipMultiplier')?.value||1));
+  const unit=base/km;
+  if($('#shipCostPerKm'))$('#shipCostPerKm').textContent=brl(unit).replace('R$ ','R$ ')+'/km';
+  if($('#shipFormulaPreview'))$('#shipFormulaPreview').textContent=`max(R$ ${min.toFixed(2).replace('.',',')}, ((R$ ${base.toFixed(2).replace('.',',')} ÷ ${km} km) × distância × ${mult}) + R$ ${fixed.toFixed(2).replace('.',',')})`;
+}
+async function saveDistanceFormula(){
+  const password=sessionStorage.getItem('rtd_admin_pass');$('#distanceFormulaMsg').textContent='Salvando...';
+  try{
+    await shippingAdminApi({action:'admin_save_distance_formula',password,modo:$('#shipCalcMode').value,custo_base:$('#shipBaseCost').value,km_base:$('#shipBaseKm').value,taxa_fixa:$('#shipFixedFee').value,valor_minimo:$('#shipMinValue').value,multiplicador:$('#shipMultiplier').value,prazo_dias:$('#shipDistanceDays').value});
+    $('#distanceFormulaMsg').className='authmsg ok';$('#distanceFormulaMsg').textContent='Fórmula de frete salva.';updateDistanceFormulaPreview();await loadShippingAdmin();
+  }catch(e){$('#distanceFormulaMsg').className='authmsg bad';$('#distanceFormulaMsg').textContent='Não foi possível salvar a fórmula.'}
+}
+async function testDistanceFormula(){
+  const password=sessionStorage.getItem('rtd_admin_pass'),cep=$('#shipTestCep').value;
+  const box=$('#distanceTestResult');box.className='formula-test-result';box.textContent='Calculando rota e frete...';
+  try{
+    const d=await shippingAdminApi({action:'admin_test_distance',password,cep_destino:cep}),q=d.cotacao;
+    if(!q){box.textContent='Não foi possível calcular a rota para este CEP.';return}
+    box.className='formula-test-result ok';
+    box.innerHTML=`<b>${esc(q.servico)}</b><br>Distância estimada: <b>${Number(q.distancia_km||0).toFixed(2).replace('.',',')} km</b><br>Valor calculado: <b>${brl(q.valor)}</b><br><small>${esc(q.formula||'')}</small>`;
+  }catch(e){box.textContent='Não foi possível calcular a distância para este CEP.'}
+}
+async function clearDistanceCache(){
+  if(!confirm('Limpar o cache de distâncias? Novas cotações serão recalculadas.'))return;
+  const password=sessionStorage.getItem('rtd_admin_pass');
+  try{await shippingAdminApi({action:'admin_clear_distance_cache',password});$('#distanceFormulaMsg').className='authmsg ok';$('#distanceFormulaMsg').textContent='Cache de distâncias limpo.'}catch{$('#distanceFormulaMsg').className='authmsg bad';$('#distanceFormulaMsg').textContent='Não foi possível limpar o cache.'}
+}
+!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -161,6 +190,18 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 .shipping-rule-actions{display:flex;gap:6px}
 .shipping-rule-actions button{border:1px solid #d9e0e3;background:#fff;border-radius:8px;padding:7px 9px;cursor:pointer}
 @media(max-width:760px){.delivery-options{grid-template-columns:1fr}.shipping-admin-grid{grid-template-columns:1fr}}
+
+
+/* RC7 — frete próprio por distância */
+.distance-formula-card{border:1px solid #dce3e6;border-radius:15px;background:#fff;padding:15px;margin-top:12px}
+.formula-preview{border-radius:12px;background:#10171a;color:#fff;padding:14px;margin-top:12px}
+.formula-preview b{display:block;font-size:16px;margin-bottom:5px}
+.formula-preview code{display:block;white-space:normal;color:#d8e1e4;font-size:13px;line-height:1.5}
+.formula-test{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+.formula-test-result{margin-top:10px;border-radius:11px;padding:11px 12px;background:#f5f7f8;font-size:13px}
+.formula-test-result.ok{background:#eef8f3;color:#17653d}
+.formula-hint{font-size:12px;color:#68767d;line-height:1.45;margin-top:8px}
+@media(max-width:640px){.formula-test{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -377,37 +418,72 @@ footer{background:#090d0f;color:#cbd4d8;padding:34px 20px}.foot{max-width:1240px
 <div id="consumableAdminGrid" class="cons-grid"><div class="loading">Abra esta aba para carregar os consumíveis.</div></div>
 </div></div>
 <div class="shipping-admin">
-  <div class="head"><div><h3>Entrega e frete</h3><p class="sub">Configure retirada, origem dos envios e faixas de CEP atendidas pela entrega própria da RTD. Os Correios exigem credenciais de contrato configuradas no backend.</p></div><button class="smallbtn" id="refreshShippingAdmin">Atualizar frete</button></div>
+  <div class="head">
+    <div>
+      <h3>Entrega e frete</h3>
+      <p class="sub">Configure a origem, a fórmula do frete próprio, retirada e integração com os Correios.</p>
+    </div>
+    <button class="smallbtn" id="refreshShippingAdmin">Atualizar frete</button>
+  </div>
+
   <div class="shipping-admin-grid">
     <div class="shipping-card">
-      <h3>Configurações gerais</h3>
+      <h3>Origem e retirada</h3>
       <div class="formgrid">
         <div class="field"><label>CEP de origem</label><input id="shipOriginCep" maxlength="9" placeholder="00000-000"></div>
         <div class="field"><label>Serviços Correios</label><input id="shipCorreiosServices" placeholder="03220,03298"></div>
-        <div class="field full"><label>Endereço de retirada</label><input id="shipPickupAddress" placeholder="Informe o endereço que será mostrado ao cliente"></div>
+        <div class="field full"><label>Endereço de origem / retirada</label><input id="shipPickupAddress" placeholder="Endereço mostrado ao cliente"></div>
       </div>
-      <button class="smallbtn" id="saveShippingSettings" style="margin-top:10px">Salvar configurações</button>
+      <button class="smallbtn" id="saveShippingSettings" style="margin-top:10px">Salvar origem</button>
       <div class="authmsg" id="shippingSettingsMsg"></div>
       <div class="statusbox" style="margin-top:12px"><b>Status Correios</b><p class="sub" id="correiosAdminStatus">Verificando...</p></div>
     </div>
-    <div class="shipping-card">
-      <h3>Nova faixa de entrega própria</h3>
-      <input type="hidden" id="shipRuleId">
+
+    <div class="distance-formula-card">
+      <h3>Frete próprio por distância</h3>
+      <p class="sub">A estrutura é editável. O valor é calculado com base na distância rodoviária estimada entre o CEP de origem e o CEP do cliente.</p>
       <div class="formgrid">
-        <div class="field full"><label>Nome da região</label><input id="shipRuleName" placeholder="Ex.: Ribeirão Preto - região central"></div>
-        <div class="field"><label>CEP inicial</label><input id="shipRuleStart" maxlength="9"></div>
-        <div class="field"><label>CEP final</label><input id="shipRuleEnd" maxlength="9"></div>
-        <div class="field"><label>Valor do frete (R$)</label><input id="shipRuleValue" type="number" min="0" step="0.01"></div>
-        <div class="field"><label>Prazo estimado (dias)</label><input id="shipRuleDays" type="number" min="0" step="1"></div>
-        <div class="field"><label>Prioridade</label><input id="shipRulePriority" type="number" value="100" step="1"></div>
-        <div class="field"><label>Status</label><select id="shipRuleActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></div>
+        <div class="field"><label>Modo de cálculo</label><select id="shipCalcMode"><option value="distancia">Por distância</option><option value="faixas">Por faixas de CEP</option></select></div>
+        <div class="field"><label>Prazo estimado (dias)</label><input id="shipDistanceDays" type="number" min="0" step="1" value="1"></div>
+        <div class="field"><label>Custo-base (R$)</label><input id="shipBaseCost" type="number" min="0" step="0.01" value="3.70"></div>
+        <div class="field"><label>KM-base</label><input id="shipBaseKm" type="number" min="0.01" step="0.01" value="8"></div>
+        <div class="field"><label>Taxa fixa (R$)</label><input id="shipFixedFee" type="number" min="0" step="0.01" value="0"></div>
+        <div class="field"><label>Valor mínimo (R$)</label><input id="shipMinValue" type="number" min="0" step="0.01" value="0"></div>
+        <div class="field"><label>Multiplicador</label><input id="shipMultiplier" type="number" min="0" step="0.01" value="1"></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px"><button class="smallbtn" id="saveShippingRule">Salvar faixa</button><button class="smallbtn" id="clearShippingRule">Limpar</button></div>
-      <div class="authmsg" id="shippingRuleMsg"></div>
+      <div class="formula-preview">
+        <b>Fórmula atual</b>
+        <code id="shipFormulaPreview">(R$ 3,70 ÷ 8 km) × distância em km</code>
+      </div>
+      <div class="formula-hint">Com os valores atuais, o custo unitário é de <b id="shipCostPerKm">R$ 0,4625/km</b>. Taxa fixa, valor mínimo e multiplicador podem ser usados futuramente sem alterar o código.</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="smallbtn" id="saveDistanceFormula">Salvar fórmula</button><button class="smallbtn" id="clearDistanceCache">Limpar cache de distâncias</button></div>
+      <div class="authmsg" id="distanceFormulaMsg"></div>
+      <div class="formula-test">
+        <input id="shipTestCep" maxlength="9" placeholder="CEP de destino para teste">
+        <button class="smallbtn" id="testDistanceFormula">Testar cálculo</button>
+      </div>
+      <div class="formula-test-result" id="distanceTestResult">Informe um CEP para simular a distância e o valor do frete próprio.</div>
     </div>
   </div>
-  <div class="shipping-card" style="margin-top:12px"><h3>Faixas cadastradas</h3><div class="shipping-rules" id="shippingRulesList"><div class="loading">Carregando...</div></div></div>
-</div>
+
+  <div class="shipping-card" style="margin-top:12px">
+    <h3>Faixas de CEP — modo alternativo</h3>
+    <p class="sub">Estas faixas ficam disponíveis caso você queira trocar o modo de cálculo de “distância” para “faixas de CEP”.</p>
+    <div class="formgrid">
+      <input type="hidden" id="shipRuleId">
+      <div class="field full"><label>Nome da região</label><input id="shipRuleName" placeholder="Ex.: Ribeirão Preto - região central"></div>
+      <div class="field"><label>CEP inicial</label><input id="shipRuleStart" maxlength="9"></div>
+      <div class="field"><label>CEP final</label><input id="shipRuleEnd" maxlength="9"></div>
+      <div class="field"><label>Valor do frete (R$)</label><input id="shipRuleValue" type="number" min="0" step="0.01"></div>
+      <div class="field"><label>Prazo estimado (dias)</label><input id="shipRuleDays" type="number" min="0" step="1"></div>
+      <div class="field"><label>Prioridade</label><input id="shipRulePriority" type="number" value="100" step="1"></div>
+      <div class="field"><label>Status</label><select id="shipRuleActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="smallbtn" id="saveShippingRule">Salvar faixa</button><button class="smallbtn" id="clearShippingRule">Limpar</button></div>
+    <div class="authmsg" id="shippingRuleMsg"></div>
+    <div class="shipping-rules" id="shippingRulesList"><div class="loading">Carregando...</div></div>
+  </div>
+</div></div>
 </div>
 <div class="adminpane" id="adminPaneFinance">
 <div class="head"><div><h2>Gestão financeira</h2><p class="sub">Indicadores calculados a partir das reservas e dos lançamentos administrativos. Cauções são exibidas separadamente e não compõem receita.</p></div><button class="smallbtn" id="refreshFinance">Atualizar financeiro</button></div>
@@ -551,7 +627,7 @@ function checkoutAddressPayload(){return {cep:$('#checkoutCep').value,endereco:$
 function renderDeliveryOptions(options=[]){
   const box=$('#deliveryOptions');if(!box)return;
   if(!options.length){box.innerHTML='<div class="loading">Nenhuma opção de entrega encontrada.</div>';return}
-  box.innerHTML=options.map(o=>{const active=selectedShipping?.metodo===o.metodo&&selectedShipping?.codigo===o.codigo;const val=o.valor==null?'—':brl(o.valor);const prazo=o.prazo_dias==null?'':o.prazo_dias===0?'Disponível para retirada':`${o.prazo_dias} dia(s) estimado(s)`;let why='';if(!o.disponivel){if(o.reason==='CORREIOS_NAO_CONFIGURADO')why='Integração dos Correios aguardando credenciais.';else if(o.reason==='DADOS_EMBALAGEM_INCOMPLETOS')why='Peso e dimensões dos itens precisam ser cadastrados.';else if(o.reason==='FORA_DA_AREA_CONFIGURADA')why='CEP fora das faixas de entrega própria cadastradas.';else why='Indisponível para este pedido.'}return `<label class="delivery-option ${active?'active':''} ${o.disponivel?'':'disabled'}"><input type="radio" name="deliveryOption" value="${esc(o.metodo+'|'+o.codigo)}" ${active?'checked':''} ${o.disponivel?'':'disabled'}><span><b>${esc(o.servico)}</b><small>${o.disponivel?`${val}${prazo?' • '+prazo:''}`:esc(why)}</small>${o.observacao?`<small>${esc(o.observacao)}</small>`:''}</span></label>`}).join('');
+  box.innerHTML=options.map(o=>{const active=selectedShipping?.metodo===o.metodo&&selectedShipping?.codigo===o.codigo;const val=o.valor==null?'—':brl(o.valor);const prazo=o.prazo_dias==null?'':o.prazo_dias===0?'Disponível para retirada':`${o.prazo_dias} dia(s) estimado(s)`;const dist=o.distancia_km!=null?` • ${Number(o.distancia_km).toFixed(2).replace('.',',')} km`:'';let why='';if(!o.disponivel){if(o.reason==='CORREIOS_NAO_CONFIGURADO')why='Integração dos Correios aguardando credenciais.';else if(o.reason==='DADOS_EMBALAGEM_INCOMPLETOS')why='Peso e dimensões dos itens precisam ser cadastrados.';else if(o.reason==='FORA_DA_AREA_CONFIGURADA')why='CEP fora das faixas de entrega própria cadastradas.';else if(o.reason==='DISTANCIA_NAO_CALCULADA')why='Não foi possível calcular a distância automaticamente para este CEP.';else why='Indisponível para este pedido.'}return `<label class="delivery-option ${active?'active':''} ${o.disponivel?'':'disabled'}"><input type="radio" name="deliveryOption" value="${esc(o.metodo+'|'+o.codigo)}" ${active?'checked':''} ${o.disponivel?'':'disabled'}><span><b>${esc(o.servico)}</b><small>${o.disponivel?`${val}${prazo?' • '+prazo:''}${dist}`:esc(why)}</small>${o.observacao?`<small>${esc(o.observacao)}</small>`:''}</span></label>`}).join('');
   box.querySelectorAll('input[name="deliveryOption"]').forEach(input=>input.addEventListener('change',()=>{const [metodo,codigo]=input.value.split('|');const found=options.find(x=>x.metodo===metodo&&String(x.codigo)===codigo);if(found){selectedShipping=found;renderDeliveryOptions(options);renderCart()}}));
 }
 async function quoteShipping(){
@@ -1201,7 +1277,24 @@ $('#newEquipment').onclick=clearEquipmentForm;$('#refreshEquipment').onclick=asy
 let shippingRulesCache=[];
 async function loadShippingAdmin(){
   const password=sessionStorage.getItem('rtd_admin_pass');if(!password)return;
-  try{const d=await shippingAdminApi({action:'admin_list',password});shippingRulesCache=d.regras||[];$('#shipOriginCep').value=d.config?.cep_origem||'';$('#shipPickupAddress').value=d.config?.retirada_endereco||'';$('#shipCorreiosServices').value=d.config?.correios_servicos||'03220,03298';$('#correiosAdminStatus').textContent=d.correios_secret_configured?'Credencial de acesso encontrada no backend.':'Aguardando credencial de contrato/chave de subdelegação dos Correios no backend.';renderShippingRules()}catch(e){$('#shippingRulesList').innerHTML='<div class="loading">Não foi possível carregar as configurações de frete.</div>'}
+  try{
+    const d=await shippingAdminApi({action:'admin_list',password});
+    shippingRulesCache=d.regras||[];
+    const c=d.config||{};
+    $('#shipOriginCep').value=c.cep_origem||'';
+    $('#shipPickupAddress').value=c.retirada_endereco||'';
+    $('#shipCorreiosServices').value=c.correios_servicos||'03220,03298';
+    $('#shipCalcMode').value=c.modo||'distancia';
+    $('#shipBaseCost').value=c.custo_base??3.70;
+    $('#shipBaseKm').value=c.km_base??8;
+    $('#shipFixedFee').value=c.taxa_fixa??0;
+    $('#shipMinValue').value=c.valor_minimo??0;
+    $('#shipMultiplier').value=c.multiplicador??1;
+    $('#shipDistanceDays').value=c.prazo_dias??1;
+    $('#correiosAdminStatus').textContent=d.correios_secret_configured?'Credencial de acesso encontrada no backend.':'Aguardando credencial de contrato/chave de subdelegação dos Correios no backend.';
+    updateDistanceFormulaPreview();
+    renderShippingRules();
+  }catch(e){$('#shippingRulesList').innerHTML='<div class="loading">Não foi possível carregar as configurações de frete.</div>'}
 }
 function renderShippingRules(){
   const box=$('#shippingRulesList');if(!box)return;
@@ -1222,6 +1315,7 @@ $('#cartModal').addEventListener('click',e=>{if(e.target===$('#cartModal'))$('#c
 $('#cartWhatsAppBtn').onclick=cartWhatsApp;
 $('#mpCheckoutBtn').onclick=startMercadoPagoCheckout;
 $('#refreshShippingAdmin').onclick=loadShippingAdmin;$('#saveShippingSettings').onclick=saveShippingSettings;$('#saveShippingRule').onclick=saveShippingRule;$('#clearShippingRule').onclick=clearShippingRule;
+$('#saveDistanceFormula').onclick=saveDistanceFormula;$('#testDistanceFormula').onclick=testDistanceFormula;$('#clearDistanceCache').onclick=clearDistanceCache;['shipBaseCost','shipBaseKm','shipFixedFee','shipMinValue','shipMultiplier'].forEach(id=>$('#'+id).addEventListener('input',updateDistanceFormulaPreview));
 
 $('#newConsumable').onclick=clearConsumableForm;$('#refreshConsumables').onclick=loadAdminConsumables;$('#saveConsumableAdmin').onclick=saveConsumableAdmin;$('#cancelConsumableEdit').onclick=clearConsumableForm;$('#deleteConsumableAdmin').onclick=()=>deleteConsumable($('#conCode').value);['conCode','conName','conCategory','conImage','conStock','conPrice','conActive'].forEach(id=>$('#'+id)?.addEventListener('input',updateConsumablePreview));$('#conActive')?.addEventListener('change',updateConsumablePreview);
 window.exportCustomer=id=>{const c=adminCustomersCache.find(x=>x.id===id);if(!c)return alert('Cliente não encontrado.');const rows=fullExportRows(id);csvDownload(`RTD_cliente_${String(c.nome_completo||'cliente').replace(/[^a-z0-9]+/gi,'_')}_historico.csv`,FULL_HEADERS,rows)};
